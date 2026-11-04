@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+  Parámetros físicos y geométricos del F450.
+
+  Las cotas no están inventadas: salen de medir la malla F450.dae que define el
+  chasis (ver dron_description/config/f450.yaml y el README). Los cuatro motores
+  de la malla están en (+-0.1589, +-0.1589, 0.09) respecto al centro de la placa
+  inferior, es decir 451 mm de diagonal motor a motor: un F450 de verdad.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Geometría -->
+  <xacro:property name="offset_motor"  value="0.1589"/>   <!-- m, en X y en Y -->
+  <xacro:property name="brazo"         value="0.2255"/>   <!-- m, radio al motor -->
+  <xacro:property name="radio_helice"  value="0.127"/>    <!-- m, hélice 10x4.5 -->
+
+  <!-- Alturas respecto al origen de base_link, que está en el centro de la placa -->
+  <xacro:property name="z_malla"       value="-0.020"/>   <!-- centra la malla en la placa -->
+  <xacro:property name="z_motor"       value="0.015"/>
+  <xacro:property name="z_helice"      value="0.082"/>    <!-- justo encima del motor -->
+  <xacro:property name="z_pata"        value="-0.055"/>
+  <xacro:property name="largo_pata"    value="0.11"/>
+
+  <!-- Masa e inercia: F450 con batería 3S centrada -->
+  <xacro:property name="masa"          value="1.15"/>
+  <xacro:property name="ixx"           value="0.0115"/>
+  <xacro:property name="iyy"           value="0.0115"/>
+  <xacro:property name="izz"           value="0.0218"/>
+
+  <!-- Posición de los sensores -->
+  <xacro:property name="z_imu"         value="0.025"/>
+  <xacro:property name="xyz_lidar"     value="0.02 0 -0.025"/>
+
+  <material name="gris">  <color rgba="0.25 0.25 0.28 1.0"/></material>
+  <material name="rojo">  <color rgba="0.75 0.15 0.15 1.0"/></material>
+  <material name="negro"> <color rgba="0.05 0.05 0.05 1.0"/></material>
+
+</robot>

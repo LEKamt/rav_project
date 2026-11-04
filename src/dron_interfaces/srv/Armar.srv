@@ -1,0 +1,7 @@
+# Armado y desarmado con confirmación. El tópico /dron/armar del firmware no dice
+# si el intento fue aceptado: armar se rechaza si no hay altura fijada o si el
+# pulsador de emergencia está pulsado, y por tópico eso solo se ve en el log.
+bool armar
+---
+bool aceptado
+string motivo     # vacío si aceptado; si no, por qué se rechazó

@@ -1,0 +1,13 @@
+# Umbrales del diagnóstico de sensores. Son los valores con los que el control
+# da por buena la telemetría; si se cruzan, el panel debe avisar aunque el vuelo
+# siga.
+diagnostico_sensores:
+  ros__parameters:
+    hz_imu_esperada: 20.0      # el firmware publica /dron/imu a PUB_IMU_HZ
+    hz_imu_minima: 10.0
+    hz_altura_esperada: 50.0   # PUB_RAPIDO_HZ
+    hz_altura_minima: 20.0
+    silencio_max: 1.0          # s sin mensajes -> ERROR
+    discrepancia_max: 0.30     # m entre LiDAR y barómetro con los dos válidos
+    acc_reposo_max: 0.15       # g de desvío sobre 1 g con el dron desarmado
+    frecuencia: 2.0            # Hz de publicación en /diagnostics

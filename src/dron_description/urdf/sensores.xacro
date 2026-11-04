@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<!--
+  Sensores del dron: IMU MPU-6500 y LiDAR VL53L0X mirando al suelo.
+
+  Los enlaces tienen masa despreciable: la conversión URDF -> SDF absorbe las
+  juntas fijas en base_link y reubica los sensores con la pose correcta.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="enlace_ligero" params="nombre">
+    <link name="${nombre}">
+      <inertial>
+        <mass value="1e-5"/>
+        <inertia ixx="1e-9" ixy="0" ixz="0" iyy="1e-9" iyz="0" izz="1e-9"/>
+      </inertial>
+    </link>
+  </xacro:macro>
+
+  <xacro:macro name="sensores" params="simulacion">
+    <xacro:enlace_ligero nombre="imu_link"/>
+    <joint name="junta_imu" type="fixed">
+      <parent link="base_link"/>
+      <child link="imu_link"/>
+      <origin xyz="0 0 ${z_imu}" rpy="0 0 0"/>
+    </joint>
+
+    <xacro:enlace_ligero nombre="lidar_link"/>
+    <!--
+      La rotación va en la junta, no dentro del <sensor>: al absorber la junta
+      fija, la conversión URDF -> SDF sustituye la pose del sensor por la de la
+      junta y descarta la que se escriba dentro. Con pitch de 90° el eje +X del
+      enlace (por donde sale el haz) apunta hacia abajo.
+    -->
+    <joint name="junta_lidar" type="fixed">
+      <parent link="base_link"/>
+      <child link="lidar_link"/>
+      <origin xyz="${xyz_lidar}" rpy="0 1.5707963 0"/>
+    </joint>
+
+    <xacro:if value="${simulacion}">
+      <!-- IMU: imita al MPU-6500 (ruido y bias del giróscopo incluidos) -->
+      <gazebo reference="imu_link">
+        <sensor name="imu_mpu6500" type="imu">
+          <always_on>true</always_on>
+          <update_rate>250</update_rate>
+          <imu>
+            <angular_velocity>
+              <x><noise type="gaussian"><mean>0.0</mean><stddev>2.0e-3</stddev><bias_mean>1.0e-4</bias_mean></noise></x>
+              <y><noise type="gaussian"><mean>0.0</mean><stddev>2.0e-3</stddev><bias_mean>1.0e-4</bias_mean></noise></y>
+              <z><noise type="gaussian"><mean>0.0</mean><stddev>2.0e-3</stddev><bias_mean>1.0e-4</bias_mean></noise></z>
+            </angular_velocity>
+            <linear_acceleration>
+              <x><noise type="gaussian"><mean>0.0</mean><stddev>1.7e-2</stddev></noise></x>
+              <y><noise type="gaussian"><mean>0.0</mean><stddev>1.7e-2</stddev></noise></y>
+              <z><noise type="gaussian"><mean>0.0</mean><stddev>1.7e-2</stddev></noise></z>
+            </linear_acceleration>
+          </imu>
+          <plugin name="plugin_imu" filename="libgazebo_ros_imu_sensor.so">
+            <ros>
+              <namespace>/sim</namespace>
+              <remapping>~/out:=imu</remapping>
+            </ros>
+            <frame_name>imu_link</frame_name>
+            <initial_orientation_as_reference>false</initial_orientation_as_reference>
+          </plugin>
+        </sensor>
+      </gazebo>
+
+      <!-- LiDAR hacia abajo: imita al VL53L0X (un haz, ~2 m útiles) -->
+      <gazebo reference="lidar_link">
+        <sensor name="lidar_vl53l0x" type="ray">
+          <always_on>true</always_on>
+          <update_rate>50</update_rate>
+          <visualize>false</visualize>
+          <ray>
+            <scan>
+              <horizontal>
+                <samples>1</samples>
+                <resolution>1</resolution>
+                <min_angle>0</min_angle>
+                <max_angle>0</max_angle>
+              </horizontal>
+            </scan>
+            <range>
+              <min>0.03</min>
+              <max>2.0</max>
+              <resolution>0.001</resolution>
+            </range>
+            <noise>
+              <type>gaussian</type>
+              <mean>0.0</mean>
+              <stddev>0.005</stddev>
+            </noise>
+          </ray>
+          <!--
+            LaserScan y no Range a propósito: cuando el haz no choca con nada, el
+            plugin publica FLT_MAX, y rclpy no puede deserializar ese valor exacto
+            en un campo float32 escalar (el límite que genera rosidl_generator_py,
+            3.402823466e38, es menor que FLT_MAX). En un array sí funciona, porque
+            la conversión va por numpy y no pasa por la validación escalar. Con
+            Range el nodo se caía en cuanto el dron subía por encima de 2 m.
+          -->
+          <plugin name="plugin_lidar" filename="libgazebo_ros_ray_sensor.so">
+            <ros>
+              <namespace>/sim</namespace>
+              <remapping>~/out:=lidar</remapping>
+            </ros>
+            <output_type>sensor_msgs/LaserScan</output_type>
+            <frame_name>lidar_link</frame_name>
+          </plugin>
+        </sensor>
+      </gazebo>
+    </xacro:if>
+  </xacro:macro>
+
+</robot>

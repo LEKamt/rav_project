@@ -1,0 +1,12 @@
+# Llevar el dron a una altura y mantenerla hasta converger.
+float32 altura            # m
+float32 tolerancia        # m, |error| que se considera alcanzado (0 -> 0.10)
+float32 tiempo_limite     # s, 0 -> 30
+---
+bool alcanzada
+float32 error_final       # m
+string resultado
+---
+float32 altura_actual     # m
+float32 error             # m
+float32 transcurrido      # s

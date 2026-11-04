@@ -1,0 +1,27 @@
+controlador_sim:
+  ros__parameters:
+    # Empuje máximo por motor. A2212/13T (1000 KV) con hélice 1045 a 3S da unos
+    # 800-850 g de empuje -> ~8.3 N. Con los 1.15 kg del F450, el hover queda en
+    # 1.15*9.81/4 = 2.82 N por motor, es decir un mando de ~0.34: coincide con el
+    # THROTTLE_HOVER = 0.36 del firmware.
+    empuje_max_motor: 8.3
+
+    # 1.0 = empuje lineal con el mando. El empuje real crece con el cuadrado de
+    # las revoluciones, pero el mando del ESC no es la velocidad: en la zona de
+    # trabajo (0.3-0.6) la aproximación lineal es razonable. Subir a 1.5 para
+    # comprobar que el control aguanta una planta más blanda abajo.
+    exponente_empuje: 1.0
+
+    # Retardo del conjunto ESC + motor + hélice. Es el parámetro que decide si una
+    # ganancia D agresiva oscila o no, así que conviene no tocarlo a la ligera.
+    tau_motor: 0.08
+
+    # Geometría del F450 en X: 225.5 mm de radio, motores a 45°.
+    brazo_efectivo: 0.1595
+
+    # Par de reacción / empuje. Determina la autoridad de guiñada.
+    k_arrastre_yaw: 0.016
+
+    # Barómetro simulado: paseo aleatorio (m/s) y ruido (m) sobre la altura real.
+    deriva_baro: 0.02
+    ruido_baro: 0.08

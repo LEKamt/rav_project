@@ -1,0 +1,16 @@
+nombre: escalon 1.0 -> 1.5 m
+descripcion: |
+  Hover a 1 m y, a los 14 s, escalón a 1.5 m. Comprueba que el filtro de consigna
+  y el límite de velocidad vertical hacen la subida sin sobrepasar, y que arriba
+  de 1 m (donde el LiDAR deja paso al barómetro) el lazo sigue sosteniendo.
+duracion: 32.0
+pasos:
+  - {t: 0.0, accion: fijar_altura, valor: 1.0}
+  - {t: 1.0, accion: armar}
+  - {t: 14.0, accion: fijar_altura, valor: 1.5}
+criterios:
+  altura_objetivo: 1.5
+  ventana: [-6.0, 0.0]
+  error_max: 0.18           # arriba manda el barómetro, con su ruido
+  pico_max: 1.85
+  modo_final: 1

@@ -1,0 +1,9 @@
+nombre: hover a 1 m y aterrizaje
+tolerancia: 0.12        # m
+limite_por_paso: 25.0   # s
+pasos:
+  - {accion: fijar, altura: 1.0}
+  - {accion: armar}
+  - {accion: ir, altura: 1.0}
+  - {accion: mantener, segundos: 10}
+  - {accion: aterrizar}

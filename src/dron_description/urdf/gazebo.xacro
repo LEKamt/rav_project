@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!--
+  Lo que solo existe dentro de Gazebo: material, amortiguamiento, actuador y
+  verdad de terreno.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="gazebo_dron">
+
+    <gazebo reference="base_link">
+      <material>Gazebo/DarkGrey</material>
+      <!--
+        Sin amortiguamiento artificial. Gazebo aplica <velocity_decay> en cada
+        paso de física, no por segundo: con 0.06 a 500 Hz el dron quedaba frenado
+        a ~12 s^-1 y no pasaba de 0.13 m/s de ascenso aunque el control pidiera
+        0.5. Medido en la propia simulación. El arrastre aerodinámico real de un
+        F450 a estas velocidades es despreciable, así que no se modela.
+      -->
+      <velocity_decay>
+        <linear>0.0</linear>
+        <angular>0.0</angular>
+      </velocity_decay>
+    </gazebo>
+
+    <!-- Actuador: wrench de cuerpo que publica el nodo controlador -->
+    <gazebo>
+      <plugin name="plugin_empuje" filename="libgazebo_ros_force.so">
+        <ros>
+          <namespace>/sim</namespace>
+          <remapping>gazebo_ros_force:=wrench</remapping>
+        </ros>
+        <link_name>base_link</link_name>
+        <force_frame>link</force_frame>
+      </plugin>
+    </gazebo>
+
+    <!-- Verdad de terreno: referencia del barómetro simulado y para graficar -->
+    <gazebo>
+      <plugin name="plugin_p3d" filename="libgazebo_ros_p3d.so">
+        <ros>
+          <namespace>/sim</namespace>
+          <remapping>odom:=odom_real</remapping>
+        </ros>
+        <body_name>base_link</body_name>
+        <frame_name>world</frame_name>
+        <update_rate>50</update_rate>
+        <gaussian_noise>0.0</gaussian_noise>
+      </plugin>
+    </gazebo>
+
+  </xacro:macro>
+
+</robot>

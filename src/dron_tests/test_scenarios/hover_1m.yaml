@@ -1,0 +1,17 @@
+nombre: hover a 1 m
+descripcion: |
+  Despegue y vuelo estacionario a 1 m. Es el escenario de referencia: comprueba
+  que la cascada de altura converge, cuánto sobrepasa y cuánto oscila.
+  z_real se mide con la verdad de terreno de Gazebo (/sim/odom_real), no con la
+  altura estimada, para que un error de estimación no pase desapercibido.
+duracion: 25.0
+pasos:
+  - {t: 0.0, accion: fijar_altura, valor: 1.0}
+  - {t: 1.0, accion: armar}
+criterios:
+  altura_objetivo: 1.0
+  ventana: [-5.0, 0.0]      # últimos 5 s
+  error_max: 0.12
+  pico_max: 1.30
+  desviacion_max: 0.06
+  modo_final: 1             # sigue ARMADO

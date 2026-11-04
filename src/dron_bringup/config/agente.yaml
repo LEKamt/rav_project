@@ -1,0 +1,14 @@
+# Enlace con el ESP32-S3. Debe coincidir con src/config.h del firmware.
+agente:
+  # --- transporte serie ---
+  dev: /dev/ttyUSB0      # puerto USB marcado UART de la DevKitC-1
+  baud: 921600           # = MICROROS_SERIAL_BAUD
+  # --- transporte wifi ---
+  puerto_udp: 8888       # = MICROROS_AGENTE_PUERTO
+  # --- comun ---
+  verbosidad: 4          # -v del agente (0-6)
+  ws_microros: /home/nikolay/microros_ws   # donde esta compilado micro_ros_agent
+
+monitor_dron:
+  ros__parameters:
+    frecuencia: 5.0

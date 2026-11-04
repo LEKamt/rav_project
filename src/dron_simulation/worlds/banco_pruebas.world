@@ -1,0 +1,74 @@
+<?xml version="1.0" ?>
+<!--
+  Mundo mínimo para el banco de pruebas del F450.
+
+  El paso de física es de 2 ms (500 Hz) porque el lazo de actitud trabaja a 250 Hz:
+  con el paso por defecto de 1 ms el factor de tiempo real cae demasiado, y con
+  pasos mayores el control empieza a ver una planta distinta a la real.
+-->
+<sdf version="1.6">
+  <world name="banco_dron">
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- Cuadricula de 1 m bajo el punto de despegue: referencia de deriva -->
+    <include>
+      <uri>model://marca_suelo</uri>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+
+    <physics name="paso_2ms" type="ode">
+      <max_step_size>0.002</max_step_size>
+      <real_time_update_rate>500</real_time_update_rate>
+      <real_time_factor>1.0</real_time_factor>
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>50</iters>
+          <sor>1.3</sor>
+        </solver>
+        <constraints>
+          <cfm>0.0</cfm>
+          <erp>0.2</erp>
+        </constraints>
+      </ode>
+    </physics>
+
+    <gravity>0 0 -9.80665</gravity>
+
+    <!-- Referencia visual de altura: marcas cada metro -->
+    <model name="poste_referencia">
+      <static>true</static>
+      <pose>1.0 0 0 0 0 0</pose>
+      <link name="poste">
+        <visual name="tramo_1m">
+          <pose>0 0 0.5 0 0 0</pose>
+          <geometry><cylinder><radius>0.02</radius><length>1.0</length></cylinder></geometry>
+          <material><ambient>0.9 0.9 0.9 1</ambient><diffuse>0.9 0.9 0.9 1</diffuse></material>
+        </visual>
+        <visual name="tramo_2m">
+          <pose>0 0 1.5 0 0 0</pose>
+          <geometry><cylinder><radius>0.02</radius><length>1.0</length></cylinder></geometry>
+          <material><ambient>0.8 0.2 0.2 1</ambient><diffuse>0.8 0.2 0.2 1</diffuse></material>
+        </visual>
+        <visual name="tramo_3m">
+          <pose>0 0 2.5 0 0 0</pose>
+          <geometry><cylinder><radius>0.02</radius><length>1.0</length></cylinder></geometry>
+          <material><ambient>0.9 0.9 0.9 1</ambient><diffuse>0.9 0.9 0.9 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <scene>
+      <ambient>0.5 0.5 0.5 1</ambient>
+      <shadows>false</shadows>
+    </scene>
+
+  </world>
+</sdf>

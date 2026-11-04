@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<!--
+  Chasis del F450 en un único base_link.
+
+  Todo (placa, brazos, motores, hélices y patas) son <visual>/<collision> del mismo
+  enlace. Así la masa y la inercia se declaran una vez y no dependen del "lumping"
+  de juntas fijas que hace la conversión URDF -> SDF. Las hélices no son juntas
+  giratorias a propósito: el empuje se aplica como un wrench de cuerpo (ver
+  gazebo.xacro), que para un cuerpo rígido es equivalente a cuatro fuerzas
+  desplazadas, y evita que unas juntas de inercia casi nula entren en el solver.
+
+  Dos variantes de visual, misma física en las dos:
+    mallas:=true   malla COLLADA del chasis y de las hélices (la de verdad)
+    mallas:=false  primitivas (arranque rápido, útil en pruebas automáticas:
+                   F450.dae son 57 MB y Gazebo los parsea en cada lanzamiento)
+
+  Las patas van en las dos variantes porque la malla del chasis no las incluye, y
+  sin ellas el LiDAR quedaría a ras de suelo y el corte de motores al aterrizar
+  no se dispararía.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Pata de aterrizaje: visual y colisión, en ambas variantes -->
+  <xacro:macro name="pata" params="nombre x y">
+    <visual name="pata_${nombre}">
+      <origin xyz="${x*0.8} ${y*0.8} ${z_pata}" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.008" length="${largo_pata}"/></geometry>
+      <material name="negro"/>
+    </visual>
+    <collision name="col_pata_${nombre}">
+      <origin xyz="${x*0.8} ${y*0.8} ${z_pata}" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.012" length="${largo_pata}"/></geometry>
+    </collision>
+  </xacro:macro>
+
+  <!-- Brazo + motor + hélice con primitivas -->
+  <xacro:macro name="brazo_primitivas" params="nombre x y material">
+    <visual name="brazo_${nombre}">
+      <origin xyz="${x/2} ${y/2} 0" rpy="0 0 ${atan2(y, x)}"/>
+      <geometry><box size="${brazo} 0.025 0.012"/></geometry>
+      <material name="${material}"/>
+    </visual>
+    <visual name="motor_${nombre}">
+      <origin xyz="${x} ${y} ${z_motor}" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.014" length="0.030"/></geometry>
+      <material name="gris"/>
+    </visual>
+    <visual name="helice_${nombre}">
+      <origin xyz="${x} ${y} ${z_helice}" rpy="0 0 0"/>
+      <geometry><cylinder radius="${radio_helice}" length="0.004"/></geometry>
+      <material name="negro"/>
+    </visual>
+  </xacro:macro>
+
+  <!-- Hélice con malla. El sentido de giro empareja con la mezcla: M1 y M3 a un
+       lado, M2 y M4 al otro (ver control.py y motores.cpp). -->
+  <xacro:macro name="helice_malla" params="nombre x y sentido">
+    <visual name="helice_${nombre}">
+      <origin xyz="${x} ${y} ${z_helice}" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://dron_description/meshes/Prop_${sentido}.dae"/>
+      </geometry>
+    </visual>
+  </xacro:macro>
+
+  <xacro:macro name="chasis" params="mallas">
+    <link name="base_link">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="${masa}"/>
+        <inertia ixx="${ixx}" ixy="0.0" ixz="0.0" iyy="${iyy}" iyz="0.0" izz="${izz}"/>
+      </inertial>
+
+      <!-- ========== visuales ========== -->
+      <xacro:if value="${mallas}">
+        <visual name="chasis_malla">
+          <origin xyz="0 0 ${z_malla}" rpy="0 0 0"/>
+          <geometry>
+            <mesh filename="package://dron_description/meshes/F450.dae"/>
+          </geometry>
+        </visual>
+        <xacro:helice_malla nombre="m1" x="${offset_motor}"  y="${offset_motor}"  sentido="CW"/>
+        <xacro:helice_malla nombre="m2" x="${offset_motor}"  y="${-offset_motor}" sentido="CCW"/>
+        <xacro:helice_malla nombre="m3" x="${-offset_motor}" y="${-offset_motor}" sentido="CW"/>
+        <xacro:helice_malla nombre="m4" x="${-offset_motor}" y="${offset_motor}"  sentido="CCW"/>
+      </xacro:if>
+
+      <xacro:unless value="${mallas}">
+        <visual name="placa">
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry><box size="0.16 0.16 0.045"/></geometry>
+          <material name="gris"/>
+        </visual>
+        <xacro:brazo_primitivas nombre="m1" x="${offset_motor}"  y="${offset_motor}"  material="rojo"/>
+        <xacro:brazo_primitivas nombre="m2" x="${offset_motor}"  y="${-offset_motor}" material="rojo"/>
+        <xacro:brazo_primitivas nombre="m3" x="${-offset_motor}" y="${-offset_motor}" material="gris"/>
+        <xacro:brazo_primitivas nombre="m4" x="${-offset_motor}" y="${offset_motor}"  material="gris"/>
+      </xacro:unless>
+
+      <!-- ========== colisiones: idénticas en las dos variantes ========== -->
+      <collision name="col_placa">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry><box size="0.16 0.16 0.045"/></geometry>
+      </collision>
+
+      <xacro:pata nombre="m1" x="${offset_motor}"  y="${offset_motor}"/>
+      <xacro:pata nombre="m2" x="${offset_motor}"  y="${-offset_motor}"/>
+      <xacro:pata nombre="m3" x="${-offset_motor}" y="${-offset_motor}"/>
+      <xacro:pata nombre="m4" x="${-offset_motor}" y="${offset_motor}"/>
+    </link>
+  </xacro:macro>
+
+</robot>

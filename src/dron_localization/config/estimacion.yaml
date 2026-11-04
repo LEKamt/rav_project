@@ -1,0 +1,6 @@
+# Marcos y cadencia del publicador de TF/odometría.
+tf_estado:
+  ros__parameters:
+    marco_fijo: odom
+    marco_base: base_link
+    frecuencia: 50.0

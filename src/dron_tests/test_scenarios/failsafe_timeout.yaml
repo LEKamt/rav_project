@@ -1,0 +1,15 @@
+nombre: failsafe por perdida de comandos
+descripcion: |
+  Hover a 1 m y, a los 12 s, se corta el flujo /dron/cmd_actitud (equivale a
+  cerrar la estación de tierra o perder el enlace). El dron debe pasar a
+  ATERRIZAJE por timeout, descender y cortar motores al detectar el suelo.
+duracion: 28.0
+pasos:
+  - {t: 0.0, accion: fijar_altura, valor: 1.0}
+  - {t: 1.0, accion: armar}
+  - {t: 12.0, accion: parar_latido}
+criterios:
+  ventana: [-3.0, 0.0]
+  modo_final: 3             # DETENIDO tras aterrizar
+  motivo_final: 2           # FS_TIMEOUT_CMD
+  z_final_max: 0.30         # acabó en el suelo (patas a 0.11 bajo base_link)

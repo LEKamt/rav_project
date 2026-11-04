@@ -1,0 +1,10 @@
+# Valores por defecto del lanzador de simulación.
+simulacion:
+  mundo: banco_pruebas.world
+  nombre_entidad: dron_f450
+
+  # Pose inicial. z = 0.12 deja el dron apoyado en las patas (la pata llega a
+  # -0.11 respecto a base_link).
+  x_inicial: 0.0
+  y_inicial: 0.0
+  z_inicial: 0.12

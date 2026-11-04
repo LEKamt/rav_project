@@ -1,0 +1,17 @@
+nombre: escalones 0.8 - 1.2 - 1.6 m
+descripcion: >
+  Recorre tres cotas para ver el comportamiento a cada lado del cambio de fuente
+  de altura: a 0.8 m manda el LiDAR, a 1.2 m es mezcla LiDAR/barómetro y a 1.6 m
+  manda el barómetro.
+tolerancia: 0.15
+limite_por_paso: 30.0
+pasos:
+  - {accion: fijar, altura: 0.8}
+  - {accion: armar}
+  - {accion: ir, altura: 0.8}
+  - {accion: mantener, segundos: 6}
+  - {accion: ir, altura: 1.2}
+  - {accion: mantener, segundos: 6}
+  - {accion: ir, altura: 1.6}
+  - {accion: mantener, segundos: 6}
+  - {accion: aterrizar}
