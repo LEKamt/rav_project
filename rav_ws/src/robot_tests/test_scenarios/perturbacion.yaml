@@ -1,0 +1,17 @@
+nombre: perturbacion en vuelo
+descripcion: |
+  Hover a 1 m y, a los 14 s, una perturbación que el modelo no conoce: -2 N de
+  fuerza vertical (unos 200 g de carga) y 0.10 N*m de par en roll (centro de masa
+  desplazado unos 9 mm). Comprueba que el control recupera la altura y sigue
+  armado. Es el escenario que distingue a una ley robusta.
+duracion: 30.0
+pasos:
+  - {t: 0.0, accion: fijar_altura, valor: 1.0}
+  - {t: 1.0, accion: armar}
+  - {t: 14.0, accion: perturbar, fuerza_z: -2.0, par_x: 0.10}
+criterios:
+  altura_objetivo: 1.0
+  ventana: [-5.0, 0.0]
+  error_max: 0.25
+  desviacion_max: 0.06
+  modo_final: 1

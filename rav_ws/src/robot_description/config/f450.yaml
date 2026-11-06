@@ -1,0 +1,31 @@
+# Parámetros físicos del F450. Única fuente para los nodos del PC; el firmware
+# tiene sus equivalentes en src/config.h (ver el README para la correspondencia).
+#
+# La geometría está medida sobre la malla robot_description/meshes/F450.dae:
+# los cuatro motores están en (+-0.1589, +-0.1589, 0.09) respecto al centro de la
+# placa inferior, o sea 451 mm de diagonal motor a motor.
+
+f450:
+  # --- masa e inercia ---
+  masa: 1.15                 # kg, con batería 3S
+  inercia_xx: 0.0115         # kg*m^2
+  inercia_yy: 0.0115
+  inercia_zz: 0.0218
+
+  # --- geometría ---
+  offset_motor: 0.1589       # m, posición del motor en X y en Y
+  radio_brazo: 0.2255        # m, del centro al motor
+  radio_helice: 0.127        # m, hélice 10x4.5
+
+  # --- batería ---
+  bateria_celdas: 3          # LiPo 3S
+  bateria_tension: 11.1      # V, nominal
+  bateria_capacidad: 2.2     # Ah
+
+  # --- propulsión ---
+  empuje_max_motor: 8.3      # N. A2212/13T (1000 KV) + 1045 a 3S: 800-850 g
+  tau_motor: 0.08            # s, retardo de ESC + motor + hélice
+  k_arrastre_yaw: 0.016      # m, par de reacción / empuje
+  # Hover teórico: 1.15*9.80665/4 = 2.82 N por motor -> 2.82/8.3 = 0.34 de mando.
+  # El firmware usa 0.36 porque incluye margen por desgaste de hélices y batería.
+  throttle_hover: 0.36
