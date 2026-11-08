@@ -5,8 +5,13 @@ Classic con el dron simulado; el control de vuelo real corre en un ESP32-S3 con
 micro-ROS. La ley de control es SMC (control por modo deslizante) y el PID se
 conserva para comparar.
 
-Hardware: chasis F450, motores A2212 1000 KV, hélices 1045, LiPo 3S 2200 mAh. La PCB
-se conecta al S3 por cables: ver [hardware/CABLEADO_S3.md](hardware/CABLEADO_S3.md).
+Hardware: chasis F450, motores A2212 1000 KV, hélices 1045, LiPo 3S 2200 mAh; GY-91
+(MPU-9250 + BMP280), VL53L0X y ultrasonido. La PCB se conecta al S3 por cables: ver
+[hardware/CABLEADO_S3.md](hardware/CABLEADO_S3.md).
+
+Ramas: `main` es la versión del curso, con batería. `tesis-cautivo` es la versión de
+la tesis, alimentada por cable desde tierra. Lo común se hace en `main` y se fusiona
+en `tesis-cautivo`.
 
 ## Estructura
 
@@ -38,6 +43,25 @@ source /opt/ros/humble/setup.bash
 colcon build --symlink-install
 source install/setup.bash
 ```
+
+## Estimación en el firmware
+
+| Qué | Cómo | Dónde |
+| --- | --- | --- |
+| IMU | GY-91 por I2C (MPU-9250 o clon MPU-6500), DLPF de 92 Hz, lazo a 500 Hz | `imu_gy91.cpp` |
+| Giro | Sesgo promediado al arrancar (quieto) + notch opcional + pasabajos Butterworth de 60 Hz | `filtros.h` |
+| Actitud | AHRS Mahony con cuaterniones (el mismo de Blaze, en FLU) | `ahrs.h` |
+| Altura | Kalman [z, vz, sesgo del baro] con la aceleración de la IMU, el VL53L0X (≤ 1 m), el ultrasonido (≤ 4 m) y el BMP280; compuerta de 3σ contra ecos falsos | `kalman_altura.h`, `sonar.cpp` |
+
+`filtros.h`, `ahrs.h`, `kalman_altura.h` y `smc.h` no dependen de Arduino: las
+pruebas los compilan en el PC con g++ (`robot_tests/unit/test_firmware_estimacion.py`
+y `test_smc_paridad.py`). La simulación (`robot_estimation`) todavía usa el filtro
+complementario y la mezcla lineal de alturas anteriores.
+
+`/dron/alturas` tiene 8 valores: fusionada, ToF, baro, consigna, vz, objetivo,
+sonar y sesgo del baro. `/dron/motores` tiene 8: los 4 PWM, el peor tiempo de la
+lectura de la IMU [µs], las lecturas fallidas, los sensores presentes (bits) y el
+`WHO_AM_I`.
 
 ## Simular
 

@@ -1,216 +1,339 @@
 #include "sensores.h"
+#include <Adafruit_BMP280.h>
+#include <Adafruit_VL53L0X.h>
+#include "imu_gy91.h"
+#include "sonar.h"
+#include "filtros.h"
+#include "ahrs.h"
+#include "kalman_altura.h"
 
-MPU6500_WE mpu(MPU_ADDR);
-MS5611 ms5611(MS5611_ADDR);
-Adafruit_VL53L0X vl53 = Adafruit_VL53L0X();
+static Adafruit_BMP280 bmp(&Wire);
+static Adafruit_VL53L0X vl53;
 
 volatile float angRoll = 0, angPitch = 0, angYaw = 0;
 volatile float velRoll = 0, velPitch = 0, velYaw = 0;
-volatile float ax_g = 0, ay_g = 0, az_g = 0;
-volatile float alturaControl = 0, alturaLiDAR = 0, alturaBaro = 0;
+volatile float ax_g = 0, ay_g = 0, az_g = 1.0f;
+volatile float alturaControl = 0, alturaLiDAR = 0, alturaSonar = 0, alturaBaro = 0;
+volatile float sesgoBaro = 0;
 volatile float velVertical = 0;
 volatile float aceleracionVertical = 0;
 volatile bool  usarLiDAR = false;
 volatile bool  imuOK = false;
+volatile bool  giroCalibrado = false;
 volatile uint32_t fallosIMUConsecutivos = 0;
+volatile uint32_t fallosIMUTotal = 0;
+volatile uint32_t tiempoIMUMaxUs = 0;
 
 SemaphoreHandle_t mutexI2C = NULL;
+EstadoSensores estadoSensores = {0, false, false, false, false};
 
-static float baroOffset = 0;
+static float sesgoGiro[3] = {0, 0, 0};      // deg/s, ejes del cuerpo
+static FiltroEjes filtroGiro, filtroAcc;
+static Mahony ahrs;
+static KalmanAltura kalman;
+static float giroUltimo[3] = {0, 0, 0};    // rad/s, para predecir si falla una lectura
+
+// Aceleración vertical acumulada por la tarea rápida y consumida por la lenta:
+// el Kalman predice con el promedio del periodo, no con una muestra suelta.
+static portMUX_TYPE muxAcc = portMUX_INITIALIZER_UNLOCKED;
+static float sumaAccZ = 0.0f;
+static uint32_t nAccZ = 0;
+
+static float presionCero = 0.0f;    // Pa, al arrancar
+static float offsetTof = 0.0f;      // m, lo que mide el ToF con el dron en el suelo
+static float offsetSonar = 0.0f;
+static float temperaturaC = 20.0f;
+
+// ==========================================
+// Lectura en ejes del cuerpo, con la calibración del acelerómetro aplicada
+static bool leerCuerpo(float acc[3], float giro[3]) {
+    LecturaIMU l;
+    if (!leerIMU(Wire, MPU_ADDR, &l)) return false;
+    acc[0] = (IMU_CUERPO_X(l.acc) - ACC_OFFSET_X) * ACC_ESCALA_X;
+    acc[1] = (IMU_CUERPO_Y(l.acc) - ACC_OFFSET_Y) * ACC_ESCALA_Y;
+    acc[2] = (IMU_CUERPO_Z(l.acc) - ACC_OFFSET_Z) * ACC_ESCALA_Z;
+    giro[0] = IMU_CUERPO_X(l.giro);
+    giro[1] = IMU_CUERPO_Y(l.giro);
+    giro[2] = IMU_CUERPO_Z(l.giro);
+    return true;
+}
+
+// Promedia el giro con el dron quieto. Si se movió, lo repite.
+static bool calibrarGiro() {
+    const int n = GIRO_CALIB_MS / PERIODO_CONTROL_MS;
+    for (int intento = 0; intento < GIRO_CALIB_INTENTOS; intento++) {
+        double suma[3] = {0, 0, 0}, suma2[3] = {0, 0, 0};
+        int validas = 0;
+        for (int i = 0; i < n; i++) {
+            float acc[3], giro[3];
+            if (leerCuerpo(acc, giro)) {
+                for (int k = 0; k < 3; k++) {
+                    suma[k] += giro[k];
+                    suma2[k] += (double)giro[k] * giro[k];
+                }
+                validas++;
+            }
+            delay(PERIODO_CONTROL_MS);
+        }
+        if (validas < n / 2) continue;
+        bool quieto = true;
+        for (int k = 0; k < 3; k++) {
+            const double media = suma[k] / validas;
+            const double var = suma2[k] / validas - media * media;
+            if (var > GIRO_CALIB_QUIETO * GIRO_CALIB_QUIETO) quieto = false;
+            sesgoGiro[k] = (float)media;
+        }
+        if (quieto) return true;
+        LOG("[IMU] Se movió durante la calibración del giro, repitiendo\n");
+    }
+    return false;   // queda el último promedio, pero no se deja armar
+}
+
+static float alturaPresion(float pa) {
+    // Fórmula barométrica internacional, relativa a la presión del arranque
+    return 44330.0f * (1.0f - powf(pa / presionCero, 0.1903f));
+}
 
 // ==========================================
 bool iniciarSensores() {
     mutexI2C = xSemaphoreCreateMutex();
     if (mutexI2C == NULL) return false;
 
-    // --- MPU-6500 ---
-    if (!mpu.init()) {
-        LOG("[ERROR] MPU-6500 no detectado\n");
+    // --- IMU (imprescindible) ---
+    uint8_t quien = 0;
+    estadoSensores.imu = iniciarIMU(Wire, MPU_ADDR, MPU_DLPF_CFG, &quien);
+    estadoSensores.whoAmI = quien;
+    if (!estadoSensores.imu) {
+        LOG("[ERROR] IMU no detectada (WHO_AM_I = 0x%02X)\n", quien);
         return false;
     }
-    mpu.autoOffsets();                              // el dron debe estar quieto y nivelado
-    mpu.setAccRange(MPU6500_ACC_RANGE_8G);
-    mpu.setGyrRange(MPU6500_GYRO_RANGE_500);
-    mpu.setGyrDLPF(MPU6500_DLPF_3);                 // ~41 Hz en hardware
-    mpu.setSampleRateDivider(0);                    // 1 kHz interno: no limita el lazo
-    LOG("[OK] MPU-6500 inicializado\n");
+    LOG("[OK] %s (0x%02X)\n", nombreIMU(quien), quien);
 
-    // --- MS5611 ---
-    if (!ms5611.begin()) {
-        LOG("[ERROR] MS5611 no detectado\n");
-        return false;
+    giroCalibrado = calibrarGiro();
+    LOG("[IMU] Sesgo del giro %.2f %.2f %.2f deg/s%s\n", sesgoGiro[0], sesgoGiro[1],
+        sesgoGiro[2], giroCalibrado ? "" : " (SIN CALIBRAR: no se podrá armar)");
+
+    const float fs = (float)FREQ_CONTROL_HZ;
+    filtroGiro.configurar(fs, GYRO_LPF_HZ, GYRO_NOTCH_ON, GYRO_NOTCH_HZ, GYRO_NOTCH_BW);
+    filtroAcc.configurar(fs, ACC_LPF_HZ, false, 0.0f, 0.0f);
+    ahrs.configurar(AHRS_KP, AHRS_KI, AHRS_RECHAZO_G);
+
+    float acc[3], giro[3];
+    if (leerCuerpo(acc, giro)) {
+        const float cero[3] = {0, 0, 0};
+        filtroAcc.reset(acc);
+        filtroGiro.reset(cero);
+        ahrs.iniciarConAcc(acc);
     }
-    // OSR bajo (~2 ms por conversión): el barómetro comparte el bus I2C con la IMU
-    // y una conversión larga retrasaría el lazo de actitud.
-    ms5611.setOversampling(OSR_LOW);
 
-    const int nCalib = 50;
-    float sumBaro = 0;
-    for (int i = 0; i < nCalib; i++) {
-        ms5611.read();
-        sumBaro += ms5611.getAltitude();
-        delay(10);
+    // --- Barómetro (opcional) ---
+    estadoSensores.baro = bmp.begin(BMP280_ADDR_1, BMP280_CHIPID) ||
+                          bmp.begin(BMP280_ADDR_2, BMP280_CHIPID);
+    if (estadoSensores.baro) {
+        // Sin el IIR fuerte del sensor: el Kalman ya filtra y el retardo le estorba
+        bmp.setSampling(Adafruit_BMP280::MODE_NORMAL, Adafruit_BMP280::SAMPLING_X2,
+                        Adafruit_BMP280::SAMPLING_X8, Adafruit_BMP280::FILTER_X4,
+                        Adafruit_BMP280::STANDBY_MS_1);
+        delay(100);
+        double suma = 0;
+        const int nb = 50;
+        for (int i = 0; i < nb; i++) {
+            suma += bmp.readPressure();
+            delay(20);
+        }
+        presionCero = (float)(suma / nb);
+        temperaturaC = bmp.readTemperature();
+        LOG("[OK] BMP280: %.1f Pa, %.1f C\n", presionCero, temperaturaC);
+    } else {
+        LOG("[AVISO] BMP280 no detectado: la altura queda solo con ToF y sonar\n");
     }
-    baroOffset = sumBaro / nCalib;
-    LOG("[OK] MS5611 calibrado. Offset: %.2f m\n", baroOffset);
 
-    // --- VL53L0X en modo continuo: readRange() bloqueaba ~30 ms por llamada ---
-    if (!vl53.begin(VL53L0X_ADDR, false, &Wire)) {
-        LOG("[ERROR] VL53L0X no detectado\n");
-        return false;
+    // --- ToF (opcional) ---
+    estadoSensores.tof = vl53.begin(VL53L0X_ADDR, false, &Wire);
+    if (estadoSensores.tof) {
+        vl53.startRangeContinuous(PERIODO_SENSORES_MS);
+        // Lo que mide en el suelo es la altura del sensor: se resta para que el
+        // suelo sea z = 0 (el aterrizaje corta a ALTURA_CORTE_MOTORES).
+        float suma = 0;
+        int n = 0;
+        for (int i = 0; i < 20; i++) {
+            delay(PERIODO_SENSORES_MS + 5);
+            if (vl53.isRangeComplete()) {
+                const uint16_t mm = vl53.readRangeResult();
+                if (mm > 10 && mm < 2000) { suma += mm / 1000.0f; n++; }
+            }
+        }
+        offsetTof = n ? suma / n : 0.0f;
+        LOG("[OK] VL53L0X en modo continuo, en el suelo mide %.3f m\n", offsetTof);
+    } else {
+        LOG("[AVISO] VL53L0X no detectado\n");
     }
-    vl53.startRangeContinuous(PERIODO_SENSORES_MS);
-    LOG("[OK] VL53L0X en modo continuo\n");
 
+    // --- Ultrasonido (opcional: se sabe si responde al medir) ---
+    iniciarSonar(PIN_SONAR_TRIG, PIN_SONAR_ECHO);
+    {
+        float suma = 0, d;
+        int n = 0;
+        for (int i = 0; i < 10; i++) {
+            dispararSonar();
+            delay(SONAR_PERIODO_MS);
+            if (leerSonar(temperaturaC, &d) && d < 1.0f) { suma += d; n++; }
+        }
+        estadoSensores.sonar = n >= 5;
+        offsetSonar = n ? suma / n : 0.0f;
+        LOG(estadoSensores.sonar ? "[OK] Ultrasonido, en el suelo mide %.3f m\n"
+                                 : "[AVISO] Ultrasonido sin eco (%.3f)\n", offsetSonar);
+    }
+
+    kalman.sigmaAcc = KF_SIGMA_ACC;
+    kalman.sigmaSesgo = KF_SIGMA_SESGO;
+    kalman.compuerta = KF_COMPUERTA;
+    kalman.maxRechazos = KF_MAX_RECHAZOS;
+    kalman.reset(0.0f, 0.0f);
     return true;
 }
 
 // ==========================================
-// Tarea rápida: IMU + filtro complementario.
-// Si el bus I2C está ocupado no espera: propaga el estado con la última velocidad
-// angular conocida y conserva la cadencia del lazo, que es lo que el control
-// necesita. Bloquear aquí metería jitter directamente en el PWM.
+// Tarea rápida: IMU + filtros + AHRS.
+// Si el bus I2C está ocupado no espera: el AHRS se propaga con el último giro y
+// el lazo conserva su cadencia, que es lo que el control necesita.
 void actualizarIMU(float dt) {
+    const uint32_t t0 = micros();
+    float acc[3], giro[3];
     bool leido = false;
-    xyzFloat acc, gyr;
 
-    if (xSemaphoreTake(mutexI2C, pdMS_TO_TICKS(2)) == pdTRUE) {
-        acc = mpu.getGValues();
-        gyr = mpu.getGyrValues();
+    if (xSemaphoreTake(mutexI2C, pdMS_TO_TICKS(1)) == pdTRUE) {
+        leido = leerCuerpo(acc, giro);
         xSemaphoreGive(mutexI2C);
-        leido = true;
     }
 
     imuOK = leido;
     if (!leido) {
         if (fallosIMUConsecutivos < 0xFFFFFFFF) fallosIMUConsecutivos++;
-        // Predicción pura: se integra la última velocidad angular filtrada
-        angRoll  += velRoll * dt;
-        angPitch += velPitch * dt;
-        angYaw   += velYaw * dt;
-        return;
+        fallosIMUTotal++;
+        const float sinAcc[3] = {0, 0, 0};     // |a| = 0: el AHRS no corrige
+        ahrs.actualizar(giroUltimo, sinAcc, dt);
+    } else {
+        fallosIMUConsecutivos = 0;
+
+        for (int k = 0; k < 3; k++) giro[k] -= sesgoGiro[k];
+
+        // Giro filtrado para el lazo de velocidad angular (P y D)
+        float giroF[3];
+        filtroGiro.paso(giro, giroF);
+        velRoll = giroF[0];
+        velPitch = giroF[1];
+        velYaw = giroF[2];
+
+        float accF[3];
+        filtroAcc.paso(acc, accF);
+        ax_g = accF[0];
+        ay_g = accF[1];
+        az_g = accF[2];
+
+        // El AHRS integra el giro sin filtrar: la integral ya es un pasabajos y
+        // así no hereda el retardo del biquad.
+        for (int k = 0; k < 3; k++) giroUltimo[k] = giro[k] * DEG_TO_RAD;
+        ahrs.actualizar(giroUltimo, accF, dt);
+
+        const float az = ahrs.aceleracionVertical(accF, 9.80665f);
+        // El PID de velocidad vertical la usa como término D: va más filtrada
+        const float alphaA = dt / (dt + 1.0f / (2.0f * PI * ACC_Z_LPF_HZ));
+        aceleracionVertical = aceleracionVertical + alphaA * (az - aceleracionVertical);
+        portENTER_CRITICAL(&muxAcc);
+        sumaAccZ += az;
+        nAccZ++;
+        portEXIT_CRITICAL(&muxAcc);
     }
-    fallosIMUConsecutivos = 0;
 
-    ax_g = acc.x;
-    ay_g = acc.y;
-    az_g = acc.z;
+    float r, p, y;
+    ahrs.euler(&r, &p, &y);
+    angRoll = r * RAD_TO_DEG;
+    angPitch = p * RAD_TO_DEG;
+    angYaw = y * RAD_TO_DEG;
 
-    // Filtro pasa-bajos del giróscopo (el término D del lazo interno lo usa)
-    const float alphaG = dt / (dt + 1.0f / (2.0f * PI * GYRO_LPF_HZ));
-    velRoll  += alphaG * (gyr.x - velRoll);
-    velPitch += alphaG * (gyr.y - velPitch);
-    velYaw   += alphaG * (gyr.z - velYaw);
-
-    float accRoll  = atan2(acc.y, acc.z) * 180.0f / PI;
-    float accPitch = atan2(-acc.x, sqrt(acc.y * acc.y + acc.z * acc.z)) * 180.0f / PI;
-
-    // alpha derivado de tau: así cambiar FREQ_CONTROL_HZ no altera el filtro
-    const float alphaC = FILTRO_COMP_TAU / (FILTRO_COMP_TAU + dt);
-    angRoll  = alphaC * (angRoll  + gyr.x * dt) + (1.0f - alphaC) * accRoll;
-    angPitch = alphaC * (angPitch + gyr.y * dt) + (1.0f - alphaC) * accPitch;
-
-    // Aceleración vertical para el término D del PID de velocidad: se proyecta la
-    // medida del acelerómetro sobre la vertical y se le quita la gravedad.
-    float azMundo = (az_g * cosf(angRoll * DEG_TO_RAD) * cosf(angPitch * DEG_TO_RAD) - 1.0f)
-                    * 9.80665f;
-    const float alphaA = dt / (dt + 1.0f / (2.0f * PI * ACC_Z_LPF_HZ));
-    aceleracionVertical += alphaA * (azMundo - aceleracionVertical);
-
-    // Sin magnetómetro (el MPU-6500 no lo tiene) el yaw deriva sin cota. Se publica
-    // como referencia, pero el control de guiñada trabaja sobre velocidad, no ángulo.
-    angYaw += gyr.z * dt;
-    if (angYaw > 180.0f)  angYaw -= 360.0f;
-    if (angYaw < -180.0f) angYaw += 360.0f;
+    const uint32_t us = micros() - t0;
+    if (us > tiempoIMUMaxUs) tiempoIMUMaxUs = us;
 }
 
 // ==========================================
-// Tarea lenta: barómetro + LiDAR + fusión + velocidad vertical
+// Tarea lenta: ToF + sonar + baro + Kalman
 void actualizarAltitud(float dt) {
-    // --- LiDAR (no bloqueante: solo lee si hay medida lista) ---
-    if (xSemaphoreTake(mutexI2C, pdMS_TO_TICKS(5)) == pdTRUE) {
-        bool listo = vl53.isRangeComplete();
-        uint16_t mm = listo ? vl53.readRangeResult() : 0;
-        xSemaphoreGive(mutexI2C);
+    // --- Predicción con la aceleración media del periodo ---
+    float acc = 0.0f;
+    portENTER_CRITICAL(&muxAcc);
+    if (nAccZ) acc = sumaAccZ / nAccZ;
+    sumaAccZ = 0.0f;
+    nAccZ = 0;
+    portEXIT_CRITICAL(&muxAcc);
+    kalman.predecir(acc, dt);
 
+    // Inclinado, el ToF y el sonar miden la hipotenusa. Se calcula con los ángulos
+    // publicados y no con ahrs.q, que la otra tarea escribe a la vez.
+    const float c = cosf(angRoll * DEG_TO_RAD) * cosf(angPitch * DEG_TO_RAD);
+    const bool proyectable = c > COS_INCL_DISTANCIA;
+
+    // --- ToF (no bloqueante: solo lee si hay medida lista) ---
+    if (estadoSensores.tof && xSemaphoreTake(mutexI2C, pdMS_TO_TICKS(5)) == pdTRUE) {
+        const bool listo = vl53.isRangeComplete();
+        const uint16_t mm = listo ? vl53.readRangeResult() : 0;
+        xSemaphoreGive(mutexI2C);
         if (listo) {
-            if (mm > 20 && mm < 3500) {      // fuera de rango devuelve 8190/8191
-                alturaLiDAR = mm / 1000.0f;
+            const float r = mm / 1000.0f;      // fuera de rango devuelve 8190/8191
+            if (proyectable && r > TOF_MIN_M && r < TOF_MAX_M) {
+                alturaLiDAR = r * c - offsetTof;
                 usarLiDAR = true;
+                kalman.corregirDistancia(0, alturaLiDAR, SIGMA_TOF);
             } else {
+                alturaLiDAR = 0.0f;
                 usarLiDAR = false;
             }
         }
     }
 
-    // --- Barómetro a 10 Hz ---
-    // Cada read() son dos conversiones ADC: mantener el mutex todo ese tiempo a
-    // 50 Hz dejaba al lazo de actitud sin lecturas de IMU en buena parte de los
-    // ciclos. A 10 Hz sobra, porque la altura va filtrada y por debajo de
-    // ALTURA_LIDAR_MAX manda el LiDAR.
-    static uint8_t divisorBaro = (FREQ_SENSORES_HZ / 10);   // la primera llamada ya lee
-    static bool primeraMuestra = true;
-    static float alturaBaroFiltrada = 0;
-
-    if (++divisorBaro >= (FREQ_SENSORES_HZ / 10)) {
-        divisorBaro = 0;
-        if (xSemaphoreTake(mutexI2C, pdMS_TO_TICKS(15)) == pdTRUE) {
-            ms5611.read();
-            float baroCrudo = ms5611.getAltitude() - baroOffset;
-            xSemaphoreGive(mutexI2C);
-
-            if (primeraMuestra) {
-                alturaBaroFiltrada = baroCrudo;
-                primeraMuestra = false;
-            }
-            alturaBaroFiltrada += 0.3f * (baroCrudo - alturaBaroFiltrada);
-            alturaBaro = alturaBaroFiltrada;
-        }
-    }
-
-    // --- Anclaje del barómetro al LiDAR ---
-    // Mientras el LiDAR es la referencia buena se estima la deriva del barómetro.
-    // Sin esto, al salir del alcance del LiDAR la altura salta de golpe a la del
-    // baro (decenas de cm de deriva) y ese escalón entra como un pico en la
-    // derivada que alimenta el PID de velocidad.
-    static float correccionBaro = 0.0f;
-    if (usarLiDAR && alturaLiDAR < ALTURA_MEZCLA_MIN && !primeraMuestra) {
-        correccionBaro += 0.05f * ((alturaLiDAR - alturaBaro) - correccionBaro);
-    }
-    float baroCorregido = alturaBaro + correccionBaro;
-
-    // --- Fusión: LiDAR cerca del suelo, baro arriba, mezcla lineal en medio ---
-    float altura;
-    if (usarLiDAR && alturaLiDAR < ALTURA_LIDAR_MAX) {
-        if (alturaLiDAR > ALTURA_MEZCLA_MIN) {
-            float k = (alturaLiDAR - ALTURA_MEZCLA_MIN) / (ALTURA_LIDAR_MAX - ALTURA_MEZCLA_MIN);
-            altura = (1.0f - k) * alturaLiDAR + k * baroCorregido;
+    // --- Ultrasonido: lee el eco del disparo anterior y lanza el siguiente ---
+    static uint32_t tSonar = 0;
+    if (millis() - tSonar >= SONAR_PERIODO_MS) {
+        tSonar = millis();
+        float d;
+        if (leerSonar(temperaturaC, &d) && proyectable && d > SONAR_MIN_M && d < SONAR_MAX_M) {
+            alturaSonar = d * c - offsetSonar;
+            kalman.corregirDistancia(1, alturaSonar, SIGMA_SONAR);
         } else {
-            altura = alturaLiDAR;
+            alturaSonar = 0.0f;
         }
-    } else {
-        altura = baroCorregido;
+        dispararSonar();
     }
 
-    // --- Velocidad vertical: filtro complementario IMU + altura ---
-    // La aceleración vertical de la IMU predice y la derivada de la altura
-    // corrige. Mismo principio que el filtro de actitud y por el mismo motivo:
-    // la derivada de la altura es ruidosa a corto plazo (el barómetro tiene
-    // ~8 cm de ruido) y la integral de la aceleración deriva a largo.
-    static float alturaPrev = 0;
-    static bool  vzInit = false;
-    if (!vzInit) {
-        alturaPrev = altura;
-        vzInit = true;
+    // --- Barómetro ---
+    static uint32_t tBaro = 0;
+    if (estadoSensores.baro && millis() - tBaro >= BARO_PERIODO_MS) {
+        tBaro = millis();
+        if (xSemaphoreTake(mutexI2C, pdMS_TO_TICKS(5)) == pdTRUE) {
+            const float pa = bmp.readPressure();
+            xSemaphoreGive(mutexI2C);
+            if (pa > 30000.0f && pa < 120000.0f) {
+                alturaBaro = alturaPresion(pa);
+                kalman.corregirBaro(alturaBaro, SIGMA_BARO);
+            }
+        }
     }
-    if (dt > 0.0f) {
-        float vzMedida = constrain((altura - alturaPrev) / dt,
-                                   -VZ_MAX_CRUDA, VZ_MAX_CRUDA);
-        velVertical += aceleracionVertical * dt;
-        velVertical += K_VZ * (vzMedida - velVertical) * dt;
-        velVertical = constrain(velVertical, -VZ_MAX_CRUDA, VZ_MAX_CRUDA);
-    }
-    alturaPrev = altura;
 
-    alturaControl = altura;
+    alturaControl = kalman.z;
+    velVertical = kalman.vz;
+    sesgoBaro = kalman.b;
+}
+
+// ==========================================
+const char *motivoNoArmar() {
+    if (!imuOK) return "IMU sin lecturas";
+    if (!giroCalibrado) return "giro sin calibrar (se movio al arrancar)";
+    // Si los ejes del cuerpo están mal configurados, la gravedad no cae en +z y
+    // el control empujaría hacia el lado equivocado.
+    const float ex = ax_g, ey = ay_g, ez = az_g - 1.0f;
+    if (sqrtf(ex * ex + ey * ey + ez * ez) > ACC_ARMADO_ERR_G)
+        return "acelerometro no marca (0,0,1) g: revisar IMU_CUERPO_* o nivelar";
+    if (fabsf(angRoll) > INCLINACION_ARMADO || fabsf(angPitch) > INCLINACION_ARMADO)
+        return "dron inclinado";
+    return nullptr;
 }
