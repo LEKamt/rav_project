@@ -13,47 +13,29 @@ Raspberry Pi (J7) y las líneas SDO, NCS y CSB de J6.
 
 | Señal | Pin del S3 | Pad de U1 (nombre en el esquemático) | Llega a |
 |---|---|---|---|
-| PWM M1 | GPIO4 | J3_11 (IO17) | R4 33 Ω → L1.2 |
-| PWM M2 | GPIO5 | J3_13 (IO4) | R3 33 Ω → L1.6 |
-| PWM M3 | GPIO6 | J2_10 (IO26) | R1 33 Ω → L2.2 |
-| PWM M4 | GPIO7 | J2_12 (IO14) | R2 33 Ω → L2.6 |
-| I2C SDA | GPIO8 | J3_2 (IO23) | J6.5 |
-| I2C SCL | GPIO9 | J3_9 (IO18) | J6.4 |
+| PWM M1 | GPIO37 | J3_11 (IO17) | R4 33 Ω → L1.2 |
+| PWM M2 | GPIO35 | J3_13 (IO4) | R3 33 Ω → L1.6 |
+| PWM M3 | GPIO17 | J2_10 (IO26) | R1 33 Ω → L2.2 |
+| PWM M4 | GPIO8 | J2_12 (IO14) | R2 33 Ω → L2.6 |
+| MPU SDA | GPIO1 |  |  |
+| MPU SCL | GPIO39 |  |  |
+| ToF SDA | GPIO4 |  |  |
+| ToF SCL | GPIO5 |  |  |
+| US TRIG | GPIO6 |  |  |
+| US ECHO | GPIO7 |  |  |
 | 3V3 | 3V3 | J2_1 (3V3) | J6.2, L1.4, L2.4 |
 | 5 V | 5V | J2_19 (EXT_5V) | +5V_PROTECTED |
 | GND | GND | J3_1 (GND) | GND |
-
-Pulsador de emergencia: **GPIO10 a GND**, directo, porque la PCB no tiene entrada
-para él. Es activo bajo con pull-up interno; sin pulsador el firmware funciona, pero
-no hay corte físico.
-
-## Lo que debe estar montado
-
-- **Módulos conversores de nivel en L1↔H1 y L2↔H2.** Sin ellos el PWM no llega a los
-  ESC: `PWM_M*` (3.3 V) y `PWM_ESC*` (5 V) solo se unen a través de esos módulos.
-- **Buck de 5 V** en IN+/IN- y out1+.
-- **Sensores I2C en J6**, en el mismo bus: MPU-6500 (0x68), MS5611 (0x77) y VL53L0X
-  (0x29). La PCB solo tiene un conector, así que el VL53L0X se conecta en paralelo.
-
-> **Atención con la GY-91.** J6 está pensado para una GY-91, y el firmware actual no
-> funciona con ella. `mpu.init()` exige el identificador de la MPU-6500, y el MS5611
-> tampoco está en ese módulo. El firmware se detiene en `[FATAL] Fallo en sensores`
-> con los motores parados.
 
 ## Motores
 
 | Motor | Posición | Conector | Giro visto desde arriba |
 |---|---|---|---|
-| M1 | Frente izquierda | J4 | Antihorario |
-| M2 | Frente derecha | J5 | Horario |
-| M3 | Atrás derecha | J8 | Antihorario |
-| M4 | Atrás izquierda | J9 | Horario |
+| M1 | Frente izquierda | J4 | Horario |
+| M2 | Frente derecha | J5 | Antihorario |
+| M3 | Atrás derecha | J8 | Horario |
+| M4 | Atrás izquierda | J9 | Antihorario |
 
-En J4, J5, J8 y J9: pin 3 = señal del ESC, pin 2 = GND, pin 1 sin usar.
-
-El sentido de giro sale del signo de la guiñada en
-`rav_ws/src/robot_control/src/robot_control/controlador_sim.py`. Comprobar la mezcla
-**sin hélices** antes del primer vuelo.
 
 ## Alimentación
 
