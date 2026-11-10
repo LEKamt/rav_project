@@ -27,6 +27,11 @@ bool armarDron() {
         LOG("[ARMAR] Rechazado: el boton de emergencia esta pulsado\n");
         return false;
     }
+    const char *motivo = motivoNoArmar();
+    if (motivo != nullptr) {
+        LOG("[ARMAR] Rechazado: %s\n", motivo);
+        return false;
+    }
     resetIntegradoresActitud();
     initControlAltitud();
     motivoFailsafe = FAILSAFE_NINGUNO;

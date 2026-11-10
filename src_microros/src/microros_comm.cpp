@@ -76,9 +76,9 @@ static std_msgs__msg__Bool msg_emergencia;
 static std_msgs__msg__Float32MultiArray msg_ganancias;
 
 // Buffers estáticos: micro-ROS no debe asignar memoria dinámica en vuelo
-static float buf_alturas[6];
+static float buf_alturas[8];
 static float buf_control[8];
-static float buf_motores[4];
+static float buf_motores[8];
 static float buf_ganancias[8];
 static std_msgs__msg__MultiArrayDimension dim_ganancias[1];
 static char label_ganancias[24];
@@ -248,7 +248,7 @@ static void destruirEntidades() {
 static void publicarImu() {
     sellarTiempo(&msg_imu.header.stamp);
 
-    // Cuaternión a partir de los ángulos del filtro complementario (ZYX)
+    // Cuaternión a partir de los ángulos del AHRS (ZYX)
     float cr = cosf(angRoll * DEG_TO_RAD * 0.5f), sr = sinf(angRoll * DEG_TO_RAD * 0.5f);
     float cp = cosf(angPitch * DEG_TO_RAD * 0.5f), sp = sinf(angPitch * DEG_TO_RAD * 0.5f);
     float cy = cosf(angYaw * DEG_TO_RAD * 0.5f), sy = sinf(angYaw * DEG_TO_RAD * 0.5f);
@@ -277,6 +277,8 @@ static void publicarRapido() {
     // El comandado se publica aparte para que la estación pueda confirmar que el
     // setpoint llegó: si se envía antes de que exista la sesión, se pierde.
     buf_alturas[5] = alturaObjetivo;
+    buf_alturas[6] = alturaSonar;           // 0 si la medida no es válida
+    buf_alturas[7] = sesgoBaro;             // sesgo del baro estimado por el Kalman
     RCSOFT(rcl_publish(&pub_alturas, &msg_alturas, NULL));
 
     buf_control[0] = throttleAplicado;
@@ -295,6 +297,14 @@ static void publicarLento() {
     buf_motores[1] = pwmMotor2;
     buf_motores[2] = pwmMotor3;
     buf_motores[3] = pwmMotor4;
+    // Diagnóstico del lazo rápido y de los sensores (sin crear otro tópico:
+    // micro-ROS tiene un número fijo de entidades)
+    buf_motores[4] = (float)tiempoIMUMaxUs;
+    buf_motores[5] = (float)fallosIMUTotal;
+    buf_motores[6] = (float)(estadoSensores.imu | estadoSensores.baro << 1 |
+                             estadoSensores.tof << 2 | estadoSensores.sonar << 3 |
+                             giroCalibrado << 4);
+    buf_motores[7] = (float)estadoSensores.whoAmI;
     RCSOFT(rcl_publish(&pub_motores, &msg_motores, NULL));
 }
 
@@ -322,9 +332,9 @@ void iniciarComunicaciones() {
     set_microros_serial_transports(Serial);
 #endif
 
-    prepararArrayPub(&msg_alturas, buf_alturas, 6);
+    prepararArrayPub(&msg_alturas, buf_alturas, 8);
     prepararArrayPub(&msg_control, buf_control, 8);
-    prepararArrayPub(&msg_motores, buf_motores, 4);
+    prepararArrayPub(&msg_motores, buf_motores, 8);
 
     // El mensaje suscrito sí necesita capacidad para lo que llegue del PC
     msg_ganancias.data.data = buf_ganancias;
