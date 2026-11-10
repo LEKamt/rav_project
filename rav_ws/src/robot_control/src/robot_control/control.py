@@ -304,11 +304,14 @@ def mezclar(throttle, corr_roll, corr_pitch, corr_yaw, par=None):
     """
     par = par or ParametrosControl()
 
+    # Hélices (10-nov, hardware/CABLEADO_S3.md): M1 y M3 horarias, M2 y M4
+    # antihorarias. Una hélice horaria hace par de reacción antihorario (+z en
+    # FLU): para guiñada + se aceleran M1 y M3.
     m = [
-        throttle + corr_roll - corr_pitch - corr_yaw,
-        throttle - corr_roll - corr_pitch + corr_yaw,
-        throttle - corr_roll + corr_pitch - corr_yaw,
-        throttle + corr_roll + corr_pitch + corr_yaw,
+        throttle + corr_roll - corr_pitch + corr_yaw,
+        throttle - corr_roll - corr_pitch - corr_yaw,
+        throttle - corr_roll + corr_pitch + corr_yaw,
+        throttle + corr_roll + corr_pitch - corr_yaw,
     ]
 
     mx, mn = max(m), min(m)

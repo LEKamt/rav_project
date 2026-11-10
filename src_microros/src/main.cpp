@@ -79,6 +79,8 @@ void setup() {
 
     Wire.begin(I2C_SDA, I2C_SCL);
     Wire.setClock(400000);
+    Wire1.begin(I2C1_SDA, I2C1_SCL);    // el VL53L0X va en su propio bus
+    Wire1.setClock(400000);
 
     initControlActitud();
     initControlAltitud();

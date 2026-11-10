@@ -411,8 +411,9 @@ class ControladorSim(Node):
         w.torque.x = self.brazo * ((t1 + t4) - (t2 + t3)) + pert.torque.x
         # tau_y = -sum(x_i * T_i): positivo = morro abajo
         w.torque.y = self.brazo * ((t3 + t4) - (t1 + t2)) + pert.torque.y
-        # Par de reacción: M2 y M4 giran al revés que M1 y M3
-        w.torque.z = self.k_yaw * ((t2 + t4) - (t1 + t3)) + pert.torque.z
+        # Par de reacción: M1 y M3 giran en sentido horario (reacción +z) y M2 y
+        # M4 en antihorario (hardware/CABLEADO_S3.md, 10-nov)
+        w.torque.z = self.k_yaw * ((t1 + t3) - (t2 + t4)) + pert.torque.z
         self.pub_wrench.publish(w)
 
     # ===================== lazo lento (50 Hz) =====================

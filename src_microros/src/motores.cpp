@@ -3,6 +3,7 @@
 #include "control_actitud.h"
 #include "emergencia.h"
 #include "config.h"
+#include "mezcla.h"
 
 volatile uint16_t pwmMotor1 = 0, pwmMotor2 = 0, pwmMotor3 = 0, pwmMotor4 = 0;
 volatile float throttleAplicado = 0.0f;
@@ -45,34 +46,13 @@ void mezclarMotores() {
         }
     }
 
-    // Mezcla en configuración X
-    // Motor 1 (frente izquierdo): +roll -pitch -yaw
-    // Motor 2 (frente derecho):   -roll -pitch +yaw
-    // Motor 3 (trasero derecho):  -roll +pitch -yaw
-    // Motor 4 (trasero izquierdo):+roll +pitch +yaw
+    // Mezcla en X con desaturación (mezcla.h, la misma de VueloF450 y de la
+    // simulación). M1 y M3 son horarias: la guiñada + los acelera.
     float m[4];
-    m[0] = throttle + roll_corr - pitch_corr - yaw_corr;
-    m[1] = throttle - roll_corr - pitch_corr + yaw_corr;
-    m[2] = throttle - roll_corr + pitch_corr - yaw_corr;
-    m[3] = throttle + roll_corr + pitch_corr + yaw_corr;
-
-    // Desaturación: si algún motor se sale del rango se desplaza el throttle común
-    // de los cuatro en vez de recortar uno solo. Recortar destruye el par
-    // diferencial justo cuando el control más lo necesita.
-    float mx = m[0], mn = m[0];
-    for (int i = 1; i < 4; i++) {
-        if (m[i] > mx) mx = m[i];
-        if (m[i] < mn) mn = m[i];
-    }
-    float desplazamiento = 0.0f;
-    if (mx > 1.0f)            desplazamiento = 1.0f - mx;
-    else if (mn < MOTOR_IDLE) desplazamiento = MOTOR_IDLE - mn;
+    mezclarX(throttle, roll_corr, pitch_corr, yaw_corr, MOTOR_IDLE, 1.0f, m);
 
     float suma = 0.0f;
-    for (int i = 0; i < 4; i++) {
-        m[i] = constrain(m[i] + desplazamiento, MOTOR_IDLE, 1.0f);
-        suma += m[i];
-    }
+    for (int i = 0; i < 4; i++) suma += m[i];
     throttleAplicado = suma / 4.0f;
 
     const uint16_t span = PWM_MAX - PWM_MIN;

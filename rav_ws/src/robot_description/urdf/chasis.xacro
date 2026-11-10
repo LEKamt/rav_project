@@ -52,8 +52,9 @@
     </visual>
   </xacro:macro>
 
-  <!-- Hélice con malla. El sentido de giro empareja con la mezcla: M1 y M3 a un
-       lado, M2 y M4 al otro (ver control.py y motores.cpp). -->
+  <!-- Hélice con malla. El sentido de giro empareja con la mezcla: M1 y M3
+       horarias, M2 y M4 antihorarias (hardware/CABLEADO_S3.md, control.py y
+       motores.cpp). -->
   <xacro:macro name="helice_malla" params="nombre x y sentido">
     <visual name="helice_${nombre}">
       <origin xyz="${x} ${y} ${z_helice}" rpy="0 0 0"/>

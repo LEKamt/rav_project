@@ -30,11 +30,11 @@ def test_pitch_positivo_acelera_la_parte_trasera():
 
 
 def test_yaw_positivo_acelera_la_diagonal_correcta():
-    """La guiñada sale del par de reacción: aceleran los dos motores que giran
-    en el mismo sentido (M2 y M4), que son los que el modelo de la simulación
-    usa con signo +1 en torque.z."""
+    """La guiñada sale del par de reacción: aceleran las dos hélices horarias
+    (M1 y M3), cuya reacción es +z y las que el modelo de la simulación usa con
+    signo +1 en torque.z."""
     m = mezclar(0.5, 0.0, 0.0, 0.1, PAR)
-    assert m[1] > m[0] and m[3] > m[2]
+    assert m[0] > m[1] and m[2] > m[3]
 
 
 def test_ralenti_minimo_con_el_dron_armado():

@@ -149,7 +149,7 @@ bool iniciarSensores() {
     }
 
     // --- ToF (opcional) ---
-    estadoSensores.tof = vl53.begin(VL53L0X_ADDR, false, &Wire);
+    estadoSensores.tof = vl53.begin(VL53L0X_ADDR, false, &Wire1);
     if (estadoSensores.tof) {
         vl53.startRangeContinuous(PERIODO_SENSORES_MS);
         // Lo que mide en el suelo es la altura del sensor: se resta para que el
@@ -273,11 +273,11 @@ void actualizarAltitud(float dt) {
     const float c = cosf(angRoll * DEG_TO_RAD) * cosf(angPitch * DEG_TO_RAD);
     const bool proyectable = c > COS_INCL_DISTANCIA;
 
-    // --- ToF (no bloqueante: solo lee si hay medida lista) ---
-    if (estadoSensores.tof && xSemaphoreTake(mutexI2C, pdMS_TO_TICKS(5)) == pdTRUE) {
+    // --- ToF (no bloqueante: solo lee si hay medida lista). Está solo en Wire1,
+    // que no comparte con la IMU, así que no necesita el mutex. ---
+    if (estadoSensores.tof) {
         const bool listo = vl53.isRangeComplete();
         const uint16_t mm = listo ? vl53.readRangeResult() : 0;
-        xSemaphoreGive(mutexI2C);
         if (listo) {
             const float r = mm / 1000.0f;      // fuera de rango devuelve 8190/8191
             if (proyectable && r > TOF_MIN_M && r < TOF_MAX_M) {

@@ -4,20 +4,23 @@
 #include <Arduino.h>
 
 // ===================== PINES =====================
-#define I2C_SDA             8
-#define I2C_SCL             9
+// Montaje real del 10-nov (hardware/CABLEADO_S3.md, el mismo de VueloF450.ino)
+#define I2C_SDA             1       // bus Wire: IMU (y BMP280 si la GY-91 lo trae)
+#define I2C_SCL             39
+#define I2C1_SDA            4       // bus Wire1: VL53L0X
+#define I2C1_SCL            5
 
-#define MOTOR1_PIN          4
-#define MOTOR2_PIN          5
-#define MOTOR3_PIN          6
-#define MOTOR4_PIN          7
+#define MOTOR1_PIN          8       // frente izquierdo, horario
+#define MOTOR2_PIN          17      // frente derecho, antihorario
+#define MOTOR3_PIN          21      // trasero derecho, horario
+#define MOTOR4_PIN          18      // trasero izquierdo, antihorario
 
-#define PIN_BOTON_EMERGENCIA 10  // Pulsador externo (activo bajo)
+#define PIN_BOTON_EMERGENCIA 10  // Pulsador externo opcional (activo bajo)
 
-// Ultrasonido (HC-SR04 o similar), directo al S3 como el pulsador: la PCB no
-// tiene entrada para él. Con un HC-SR04 de 5 V, divisor 1 k / 2 k en el eco.
-#define PIN_SONAR_TRIG      11
-#define PIN_SONAR_ECHO      12
+// Ultrasonido (HC-SR04 o similar), directo al S3: la PCB no tiene entrada para
+// él. Con un HC-SR04 de 5 V, divisor 1 k / 2 k en el eco.
+#define PIN_SONAR_TRIG      6
+#define PIN_SONAR_ECHO      7
 
 // ===================== DIRECCIONES I2C =====================
 // GY-91 en J6: MPU-9250 (o clon MPU-6500) + BMP280. El BMP280 está en 0x76 o en
