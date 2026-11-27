@@ -68,6 +68,18 @@ const char PAGINA[] PROGMEM = R"HTML(<!DOCTYPE html>
 <button class="aplicar" onclick="aplicar()">APLICAR GANANCIAS</button>
 <div id="activas">Activas en el dron: -</div>
 
+<h2>Identificacion (balancin)</h2>
+<div class="gan">
+ <span>Eje</span><select id="ideje" style="font-size:20px;padding:8px;border-radius:8px"><option value="r">roll</option><option value="p">pitch</option></select>
+ <span>Amplitud<br><small>fraccion</small></span><input id="idamp" type="number" step="0.005" value="0.03" inputmode="decimal">
+ <span>f0 Hz</span><input id="idf0" type="number" step="0.1" value="0.5" inputmode="decimal">
+ <span>f1 Hz</span><input id="idf1" type="number" step="0.5" value="10" inputmode="decimal">
+ <span>Duracion s</span><input id="iddur" type="number" step="1" value="20" inputmode="decimal">
+</div>
+<div class="fila"><button style="background:#6a1b9a" onclick="ident('start')">INICIAR ENSAYO</button><button style="background:#444" onclick="ident('stop')">DETENER ENSAYO</button></div>
+<div id="idest" style="text-align:left">Ensayo: -</div>
+<a href="/ident.csv" download="ident.csv"><button style="background:#00695c">DESCARGAR CSV</button></a>
+
 <h2>Control</h2>
 <button class="armar" onclick="cmd('a')">ARMAR (15 %) - solo si esta detenido</button>
 <div class="fila"><button onclick="cmd('down')">- 5 %</button><button onclick="cmd('up')">+ 5 %</button></div>
@@ -83,6 +95,8 @@ function aplicar(){
  var q='/pid?kpr='+kpr.value+'&kdr='+kdr.value+'&kir='+kir.value+'&kpp='+kpp.value+'&kdp='+kdp.value+'&kip='+kip.value+'&kpy='+kpy.value+'&db='+db.value;
  fetch(q).then(function(){primera=true;}).catch(function(){});
 }
+function ident(c){var q='/ident?c='+c;if(c=='start')q+='&eje='+ideje.value+'&amp='+idamp.value+'&f0='+idf0.value+'&f1='+idf1.value+'&dur='+iddur.value;
+ fetch(q).then(function(r){return r.text();}).then(function(t){msg.textContent=t;setTimeout(function(){msg.textContent='';},4000);}).catch(function(){});}
 function pausar(){pausado=!pausado;pausa.textContent=pausado?'Seguir':'Pausar';}
 function escala(){esc=(esc==45)?30:(esc==30?15:(esc==15?5:45));document.getElementById('esc').textContent=esc;dibujar();}
 function trazo(ctx,a,w,h,color){
@@ -110,7 +124,7 @@ function leer(){
   estado.textContent=d.bajada?'BAJADA AUTOMATICA':(d.activo?'VUELO ACTIVO':'DETENIDO');
   if(!document.activeElement||document.activeElement.id!=='barra'){barra.value=Math.round(d.obj*100);obj.textContent=barra.value;}
   m1.textContent=d.m[0];m2.textContent=d.m[1];m3.textContent=d.m[2];m4.textContent=d.m[3];
-  hz.textContent=d.hz;corte.textContent=d.corte||'-';
+  hz.textContent=d.hz;idest.textContent='Ensayo: '+(d.ida?('grabando '+(d.idn/500).toFixed(1)+' s'):(d.idl?('listo, '+d.idn+' muestras ('+d.idf+')'):'sin datos'));corte.textContent=d.corte||'-';
   if(d.seq<seq){R=[];P=[];}
   seq=d.seq;
   if(!pausado){

@@ -51,7 +51,7 @@
 // --- Configuracion PWM ---
 // [V2] 400 Hz. Si algun ESC no lo acepta (motor que tartamudea o no arranca en la
 // prueba sin helices), volver a 50.
-#define PWM_FREQ 400
+#define PWM_FREQ 50
 #define PWM_RES 14
 const uint32_t DUTY_MAX = (1 << PWM_RES) - 1;
 const uint32_t PERIODO_US = 1000000UL / PWM_FREQ;
@@ -157,6 +157,23 @@ volatile char motivoCorte[40] = "";   // [V2] ultimo corte automatico
 volatile int16_t logR[LOG_N], logP[LOG_N];
 volatile uint32_t logSeq = 0;
 
+// --- [ID] Identificacion de la planta en el balancin ---
+// Con el dron armado, suma al mando del eje elegido un chirp logaritmico de f0 a f1 Hz
+// y graba cada ciclo (500 Hz) en RAM. Durante el ensayo: banda muerta 0 y el otro
+// eje y la guinada en 0 (estan trabados por el tubo). Se descarga en /ident.csv.
+#define ID_N 10000                       // 20 s a 500 Hz (~130 kB de RAM)
+#define ID_ANG_ABORTO 30.0f              // si el eje pasa de esto, se corta la excitacion
+int16_t  idExc[ID_N], idU[ID_N], idAng[ID_N], idRate[ID_N], idThr[ID_N];
+uint16_t idDt[ID_N];
+uint8_t  idSat[ID_N];
+volatile bool idPedido = false, idActivo = false, idListo = false;
+volatile uint32_t idCount = 0;
+volatile char idEje = 'r';
+volatile float idAmp = 0.03f, idF0 = 0.5f, idF1 = 10.0f, idDur = 20.0f;
+float idT = 0, idFase = 0;
+float idGan[5];                          // Kp, Kd, Ki, db y throttle al iniciar
+volatile char idFin[32] = "";            // por que termino el ensayo
+
 // [V2] Devuelve false si la lectura fallo.
 bool leerMPU6500() {
   Wire.beginTransmission(0x68);
@@ -245,10 +262,13 @@ void webEstado() {
   char cab[320];
   snprintf(cab, sizeof(cab),
            "{\"roll\":%.2f,\"pitch\":%.2f,\"thr\":%.3f,\"obj\":%.3f,\"activo\":%s,\"bajada\":%s,\"seq\":%lu,"
-           "\"m\":[%d,%d,%d,%d],\"hz\":%.0f,\"corte\":\"%s\",",
+           "\"m\":[%d,%d,%d,%d],\"hz\":%.0f,\"corte\":\"%s\","
+           "\"ida\":%s,\"idn\":%lu,\"idl\":%s,\"idf\":\"%s\",",
            tel_roll, tel_pitch, tel_throttle, target_throttle,
            vuelo_activo ? "true" : "false", enBajada ? "true" : "false", (unsigned long)hasta,
-           tel_m[0], tel_m[1], tel_m[2], tel_m[3], tel_hz, (const char *)motivoCorte);
+           tel_m[0], tel_m[1], tel_m[2], tel_m[3], tel_hz, (const char *)motivoCorte,
+           (idActivo || idPedido) ? "true" : "false", (unsigned long)idCount,
+           idListo ? "true" : "false", (const char *)idFin);
   char k[180];
   // orden: kpr, kdr, kir, kpp, kdp, kip, db, kpy
   snprintf(k, sizeof(k), "\"k\":[%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,%.2f,%.5f],",
@@ -293,6 +313,67 @@ void webPid() {
   servidor.send(200, "text/plain", "ok");
 }
 
+// [ID] /ident?c=start&eje=r&amp=0.03&f0=0.5&f1=10&dur=20   /ident?c=stop
+void webIdent() {
+  latido();
+  const String c = servidor.arg("c");
+  if (c == "stop") {
+    if (idActivo) { idActivo = false; idListo = true; strcpy((char *)idFin, "detenido a mano"); }
+    servidor.send(200, "text/plain", "ensayo detenido");
+    return;
+  }
+  if (c != "start") { servidor.send(400, "text/plain", "c=start o c=stop"); return; }
+  if (!vuelo_activo) { servidor.send(200, "text/plain", "primero ARMAR y subir el acelerador"); return; }
+  if (idActivo || idPedido) { servidor.send(200, "text/plain", "ya hay un ensayo en curso"); return; }
+  idEje = (servidor.arg("eje") == "p") ? 'p' : 'r';
+  if (servidor.hasArg("amp")) idAmp = constrain(servidor.arg("amp").toFloat(), 0.0f, 0.10f);
+  if (servidor.hasArg("f0"))  idF0  = constrain(servidor.arg("f0").toFloat(),  0.1f, 20.0f);
+  if (servidor.hasArg("f1"))  idF1  = constrain(servidor.arg("f1").toFloat(),  0.1f, 20.0f);
+  if (servidor.hasArg("dur")) idDur = constrain(servidor.arg("dur").toFloat(), 1.0f, ID_N / (float)LAZO_HZ);
+  idPedido = true;   // lo arranca loop() en el proximo ciclo
+  servidor.send(200, "text/plain", "ensayo iniciado");
+}
+
+// [ID] CSV por partes: 10000 filas no caben de una vez en un String
+void webIdentCsv() {
+  latido();
+  if (idActivo || !idListo || idCount == 0) {
+    servidor.send(200, "text/plain", "no hay ensayo terminado");
+    return;
+  }
+  // La descarga tarda 1-3 s y deja sin latido a la pagina: solo con el dron detenido
+  if (vuelo_activo) {
+    servidor.send(200, "text/plain", "primero PARAR, luego descargar");
+    return;
+  }
+  servidor.setContentLength(CONTENT_LENGTH_UNKNOWN);
+  servidor.sendHeader("Content-Disposition", "attachment; filename=ident.csv");
+  servidor.send(200, "text/csv", "");
+  char linea[96];
+  String bloque;
+  bloque.reserve(4200);
+  snprintf(linea, sizeof(linea), "# eje=%c fs=%d kp=%.6f kd=%.6f ki=%.6f db=%.2f thr=%.3f\n",
+           (char)idEje, LAZO_HZ, idGan[0], idGan[1], idGan[2], idGan[3], idGan[4]);
+  bloque += linea;
+  snprintf(linea, sizeof(linea), "# amp=%.4f f0=%.3f f1=%.3f dur=%.2f fin=%s\n",
+           (float)idAmp, (float)idF0, (float)idF1, (float)idDur, (const char *)idFin);
+  bloque += linea;
+  bloque += "dt_us,exc,u,ang,rate,thr,sat\n";
+  for (uint32_t i = 0; i < idCount; i++) {
+    snprintf(linea, sizeof(linea), "%u,%.4f,%.4f,%.2f,%.1f,%.3f,%u\n",
+             idDt[i], idExc[i] / 10000.0f, idU[i] / 10000.0f, idAng[i] / 100.0f,
+             idRate[i] / 10.0f, idThr[i] / 1000.0f, idSat[i]);
+    bloque += linea;
+    if (bloque.length() > 4000) { servidor.sendContent(bloque); bloque = ""; }
+  }
+  if (bloque.length()) servidor.sendContent(bloque);
+  servidor.sendContent("");
+}
+
+static inline int16_t aI16(float v, float esc) {
+  return (int16_t)constrain(v * esc, -32767.0f, 32767.0f);
+}
+
 void tareaWeb(void *) {
   for (;;) {
     servidor.handleClient();
@@ -308,6 +389,8 @@ void iniciarWiFi() {
   servidor.on("/estado", webEstado);
   servidor.on("/cmd", webComando);
   servidor.on("/pid", webPid);
+  servidor.on("/ident", webIdent);         // [ID]
+  servidor.on("/ident.csv", webIdentCsv);  // [ID]
   servidor.begin();
   xTaskCreatePinnedToCore(tareaWeb, "web", 8192, NULL, 1, NULL, 0);
   Serial0.print("WiFi: red "); Serial0.print(WIFI_RED);
@@ -447,14 +530,34 @@ void loop() {
     throttle_base = 0.0;
   }
 
+  // [ID] Arranque del ensayo (pedido desde la web, se hace aqui para no competir con loop)
+  if (idPedido) {
+    idPedido = false;
+    if (vuelo_activo) {
+      bool r = (idEje == 'r');
+      idGan[0] = r ? Kp_roll : Kp_pitch;
+      idGan[1] = r ? Kd_roll : Kd_pitch;
+      idGan[2] = r ? Ki_roll : Ki_pitch;
+      idGan[3] = 0.0f;                    // banda muerta forzada a 0 en el ensayo
+      idGan[4] = throttle_base;
+      idCount = 0; idT = 0; idFase = 0;
+      idFin[0] = '\0';
+      idListo = false;
+      idActivo = true;
+      Serial0.printf("ID: inicio eje %c amp %.3f %.2f-%.2f Hz %.1f s\n",
+                     (char)idEje, (float)idAmp, (float)idF0, (float)idF1, (float)idDur);
+    }
+  }
+
   if (vuelo_activo && throttle_base > 0.01) {
     // Signos de la P como los dejaron (funcionan): error_roll = +angle_roll,
     // error_pitch = -angle_pitch.
     float raw_error_roll  = angle_roll;
     float raw_error_pitch = -angle_pitch;
 
-    float error_roll  = softDeadband(raw_error_roll,  deadband_deg);
-    float error_pitch = softDeadband(raw_error_pitch, deadband_deg);
+    const float db = idActivo ? 0.0f : deadband_deg;   // [ID] sin banda muerta en el ensayo
+    float error_roll  = softDeadband(raw_error_roll,  db);
+    float error_pitch = softDeadband(raw_error_pitch, db);
 
     // [V2] D = Kd * d(error)/dt, con la derivada medida por el giro:
     //   d(error_roll)/dt  = +rate_roll
@@ -469,6 +572,18 @@ void loop() {
     // [V2] Guinada: frena el giro. rate_yaw > 0 (antihorario) -> acelerar M2 y M4
     // (helices antihorarias, su reaccion empuja el cuerpo en sentido horario).
     float pid_yaw = constrain(-Kp_yaw * rate_yaw, -YAW_OUT_MAX, YAW_OUT_MAX);
+
+    // [ID] Excitacion: chirp logaritmico sumado al mando del eje ensayado
+    float exc = 0.0f;
+    if (idActivo) {
+      float f = idF0 * powf(idF1 / idF0, idT / idDur);
+      idFase += 2.0f * PI * f * dt;
+      exc = idAmp * sinf(idFase);
+      idT += dt;
+      pid_yaw = 0.0f;                       // la guinada esta trabada por el tubo
+      if (idEje == 'r') { pid_roll += exc;  pid_pitch = 0.0f; }
+      else              { pid_pitch += exc; pid_roll = 0.0f; }
+    }
 
     float m1_speed = throttle_base - pid_roll + pid_pitch + pid_yaw;
     float m2_speed = throttle_base + pid_roll + pid_pitch - pid_yaw;
@@ -502,11 +617,42 @@ void loop() {
       i_pitch = constrain(i_pitch + Ki_pitch * raw_error_pitch * dt, -I_OUT_MAX, I_OUT_MAX);
     }
 
+    // [ID] Grabar la muestra. u = mando que REALMENTE salio del mezclador
+    // (si satura, el mezclador lo escala y eso tiene que verse en los datos).
+    if (idActivo) {
+      bool r = (idEje == 'r');
+      float u_ef = r ? ((m2_speed + m3_speed) - (m1_speed + m4_speed)) * 0.25f
+                     : ((m1_speed + m2_speed) - (m3_speed + m4_speed)) * 0.25f;
+      float ang  = r ? angle_roll : angle_pitch;
+      float rate = r ? rate_roll  : rate_pitch;
+      uint32_t k = idCount;
+      idDt[k]   = (uint16_t)constrain(dt * 1e6f, 0.0f, 65535.0f);
+      idExc[k]  = aI16(exc, 10000.0f);
+      idU[k]    = aI16(u_ef, 10000.0f);
+      idAng[k]  = aI16(ang, 100.0f);
+      idRate[k] = aI16(rate, 10.0f);
+      idThr[k]  = aI16(throttle_base, 1000.0f);
+      idSat[k]  = saturado ? 1 : 0;
+      idCount = k + 1;
+      const char *fin = nullptr;
+      if (fabsf(ang) > ID_ANG_ABORTO) fin = "angulo > 30: abortado";
+      else if (idCount >= ID_N || idT >= idDur) fin = "completo";
+      if (fin) {
+        idActivo = false; idListo = true;
+        strcpy((char *)idFin, fin);
+        Serial0.printf("ID: fin (%s), %lu muestras\n", fin, (unsigned long)idCount);
+      }
+    }
+
     setMotorPulse(0, PULSO_IDLE + (int)(m1_speed * (PULSO_MAX - PULSO_IDLE)));
     setMotorPulse(1, PULSO_IDLE + (int)(m2_speed * (PULSO_MAX - PULSO_IDLE)));
     setMotorPulse(2, PULSO_IDLE + (int)(m3_speed * (PULSO_MAX - PULSO_IDLE)));
     setMotorPulse(3, PULSO_IDLE + (int)(m4_speed * (PULSO_MAX - PULSO_IDLE)));
   } else {
+    if (idActivo) {   // [ID] se detuvo el vuelo en pleno ensayo: se guarda lo grabado
+      idActivo = false; idListo = (idCount > 0);
+      strcpy((char *)idFin, "vuelo detenido");
+    }
     i_roll = 0; i_pitch = 0;
     setMotorPulse(0, PULSO_IDLE); setMotorPulse(1, PULSO_IDLE);
     setMotorPulse(2, PULSO_IDLE); setMotorPulse(3, PULSO_IDLE);
