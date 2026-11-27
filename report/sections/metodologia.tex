@@ -66,8 +66,8 @@ La Fig.~\ref{fig:arq} muestra la arquitectura; las ecuaciones citadas son las de
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.93\textwidth]{f_arquitectura.png}
-\caption{Arquitectura de control del firmware V\_11. En verde, el lazo de altura y su estimador; en azul, la cascada de actitud; en naranja, las extensiones robusta y adaptativa; en gris, sensores y actuadores.}
+\includegraphics[width=0.93\textwidth]{f_esquema.png}
+\caption{Esquema de control del firmware. Control de actitud en cascada: lazo externo P de ángulo, inversión de la ec. (26), lazo interno P de velocidad angular y linealización por realimentación $\bm u=I\bm v_\omega+\bm\omega\times I\bm\omega$ (ec. 41). El control lateral del esquema del curso no se implementa: sin sensor de $x$, $y$, las referencias $\phi_d$, $\theta_d$ se fijan desde la página web.}
 \label{fig:arq}
 \end{figure*}
 
@@ -148,4 +148,4 @@ V\_11 & Kalman con el ruido medido del ultrasonido (13\,cm a 1.2\,m, no 4\,cm), 
 \end{table}
 
 \subsection{Protocolo experimental y procesamiento}
-La caja negra graba a 50\,Hz al armar y se descarga en CSV de 25 columnas: tiempo, modo, estado del mezclador, ángulos, velocidades angulares, altura estimada y de referencia, velocidad vertical, empuje, ambos sensores de distancia, mando por motor y aceleración vertical. Todos los vuelos son del 26-nov-2026. Se analizan los registros recortados a los tramos de interés (los huecos se detectan por saltos de tiempo $>0.1$\,s y no se unen): dos vuelos V\_11 (A: 19:09:36, 21.0\,s; B: 19:25:45, 33.0\,s) y cinco de V\_10/V\_10b como referencia. Las métricas se calculan sobre las muestras con altura estimada $>0.15$\,m (``en el aire''), con el script \texttt{make\_figures.py}. Las ganancias son las por defecto de la Tabla~\ref{tab:gan}. El CSV no registra la referencia de actitud ni los interruptores robusto/adaptativo, que por defecto están apagados, ni la tensión de batería.
+La caja negra graba a 50\,Hz al armar y se descarga en CSV de 25 columnas: tiempo, modo, estado del mezclador, ángulos, velocidades angulares, altura estimada y de referencia, velocidad vertical, empuje, ambos sensores de distancia, mando por motor y aceleración vertical. Todos los vuelos son del 26-nov-2026 y se hicieron con el dron atado con una cuerda por seguridad; una cuerda tensa puede sostener inclinaciones que en vuelo libre desplazarían al dron. Se analizan los registros recortados a los tramos de interés (los huecos se detectan por saltos de tiempo $>0.1$\,s y no se unen): dos vuelos V\_11 (A: 19:09:36, 21.0\,s; B: 19:25:45, 33.0\,s) y cinco de V\_10/V\_10b como referencia. Las métricas se calculan sobre las muestras con altura estimada $>0.15$\,m (``en el aire''), con el script \texttt{make\_figures.py}. Las ganancias son las por defecto de la Tabla~\ref{tab:gan}. El CSV no registra la referencia de actitud ni los interruptores robusto/adaptativo, que por defecto están apagados, ni la tensión de batería.

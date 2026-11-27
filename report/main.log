@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.9.13)  27 NOV 2026 11:19
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.9.13)  27 NOV 2026 12:54
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -573,58 +573,77 @@ m/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 34)$ \T1/ptm/m/n
 /10 y
  []
 
-<figures/f_arquitectura.png, id=108, 404.712pt x 182.3613pt>
-File: figures/f_arquitectura.png Graphic file (type png)
-<use figures/f_arquitectura.png>
-Package pdftex.def Info: figures/f_arquitectura.png  used on input line 69.
-(pdftex.def)             Requested size: 479.87622pt x 216.24184pt.
+<figures/f_esquema.png, id=112, 404.712pt x 157.3077pt>
+File: figures/f_esquema.png Graphic file (type png)
+<use figures/f_esquema.png>
+Package pdftex.def Info: figures/f_esquema.png  used on input line 69.
+(pdftex.def)             Requested size: 479.87622pt x 186.53357pt.
 LaTeX Font Info:    Trying to load font information for T1+pcr on input line 96
 .
 (C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 )
-[2]) (sections/resultados.tex [3 <./figures/f_arquitectura.png>]
-<figures/f_ident.png, id=148, 505.6491pt x 157.7895pt>
+[2]) (sections/resultados.tex [3 <./figures/f_esquema.png>]
+<figures/f_ident.png, id=156, 505.6491pt x 157.7895pt>
 File: figures/f_ident.png Graphic file (type png)
 <use figures/f_ident.png>
 Package pdftex.def Info: figures/f_ident.png  used on input line 31.
 (pdftex.def)             Requested size: 479.87622pt x 149.75229pt.
-<figures/f_vuelo_B.png, id=151, 236.082pt x 394.1124pt>
+<figures/f_actitud.png, id=159, 504.4446pt x 269.5671pt>
+File: figures/f_actitud.png Graphic file (type png)
+<use figures/f_actitud.png>
+Package pdftex.def Info: figures/f_actitud.png  used on input line 43.
+(pdftex.def)             Requested size: 479.87622pt x 256.44102pt.
+<figures/f_hold_versiones.png, id=163, 504.6855pt x 258.0039pt>
+File: figures/f_hold_versiones.png Graphic file (type png)
+<use figures/f_hold_versiones.png>
+Package pdftex.def Info: figures/f_hold_versiones.png  used on input line 52.
+(pdftex.def)             Requested size: 479.87622pt x 245.33064pt.
+
+Overfull \hbox (1.72058pt too wide) in paragraph at lines 61--71
+ [][] 
+ []
+
+<figures/f_vuelo_B.png, id=166, 236.082pt x 394.1124pt>
 File: figures/f_vuelo_B.png Graphic file (type png)
 <use figures/f_vuelo_B.png>
-Package pdftex.def Info: figures/f_vuelo_B.png  used on input line 43.
+Package pdftex.def Info: figures/f_vuelo_B.png  used on input line 78.
 (pdftex.def)             Requested size: 244.4403pt x 408.06912pt.
- [4]
-<figures/f_hold_A.png, id=167, 241.6227pt x 285.4665pt>
+[4]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [5 <./figures/f_ident.png> <./figures/f_actitud.png>]
+<figures/f_hold_A.png, id=189, 241.6227pt x 285.4665pt>
 File: figures/f_hold_A.png Graphic file (type png)
 <use figures/f_hold_A.png>
-Package pdftex.def Info: figures/f_hold_A.png  used on input line 82.
+Package pdftex.def Info: figures/f_hold_A.png  used on input line 117.
 (pdftex.def)             Requested size: 234.35815pt x 276.8978pt.
-<figures/f_estimador.png, id=170, 238.2501pt x 242.3454pt>
+<figures/f_estimador.png, id=192, 238.2501pt x 242.3454pt>
 File: figures/f_estimador.png Graphic file (type png)
 <use figures/f_estimador.png>
-Package pdftex.def Info: figures/f_estimador.png  used on input line 110.
+Package pdftex.def Info: figures/f_estimador.png  used on input line 145.
 (pdftex.def)             Requested size: 234.35815pt x 238.39915pt.
- [5 <./figures/f_ident.png>]) (sections/conclusiones.tex [6 <./figures/f_vuelo_
-B.png> <./figures/f_hold_A.png>]) [7
+ [6 <./figures/f_hold_versiones.png>]
+Underfull \vbox (badness 1097) has occurred while \output is active []
 
- <./figures/f_estimador.png>] (sections/anexo_A.tex
-<figures/Iz.jpg, id=194, 903.375pt x 1606.0pt>
+)
+(sections/conclusiones.tex [7 <./figures/f_vuelo_B.png> <./figures/f_hold_A.png
+>]) [8 <./figures/f_estimador.png>] (sections/anexo_A.tex
+<figures/Iz.jpg, id=215, 903.375pt x 1606.0pt>
 File: figures/Iz.jpg Graphic file (type jpg)
 <use figures/Iz.jpg>
 Package pdftex.def Info: figures/Iz.jpg  used on input line 20.
 (pdftex.def)             Requested size: 115.22359pt x 204.85974pt.
-<figures/Ix.jpg, id=195, 903.375pt x 1606.0pt>
+<figures/Ix.jpg, id=216, 903.375pt x 1606.0pt>
 File: figures/Ix.jpg Graphic file (type jpg)
 <use figures/Ix.jpg>
 Package pdftex.def Info: figures/Ix.jpg  used on input line 24.
 (pdftex.def)             Requested size: 115.22359pt x 204.85974pt.
+ [9
 
-[8
 
-
- <./figures/Iz.jpg (PNG copy)> <./figures/Ix.jpg (PNG copy)>] [9] [10]
-<figures/kf_ajuste.png, id=226, 404.712pt x 260.172pt>
+ <./figures/Iz.jpg (PNG copy)> <./figures/Ix.jpg (PNG copy)>] [10] [11]
+<figures/kf_ajuste.png, id=247, 404.712pt x 260.172pt>
 File: figures/kf_ajuste.png Graphic file (type png)
 <use figures/kf_ajuste.png>
 Package pdftex.def Info: figures/kf_ajuste.png  used on input line 188.
@@ -641,7 +660,7 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[11 <./figures/kf_ajuste.png>] (main.aux
+[12 <./figures/kf_ajuste.png>] (main.aux
 LaTeX Info: Redefining \. on input line 14.
 LaTeX Info: Redefining \% on input line 14.
 )
@@ -650,16 +669,16 @@ LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 343F194A6D88D5BC7B2567541D15C475;2910.
+(rerunfilecheck)             Checksum: 2E9C96F5F08784FEF0AD8417F0E68970;3140.
  ) 
 Here is how much of TeX's memory you used:
- 13200 strings out of 467871
- 211429 string characters out of 5418860
- 654822 words of memory out of 5000000
- 41788 multiletter control sequences out of 15000+600000
+ 13227 strings out of 467871
+ 212014 string characters out of 5418860
+ 656435 words of memory out of 5000000
+ 41810 multiletter control sequences out of 15000+600000
  752421 words of font info for 188 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 80i,11n,82p,1530b,555s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 80i,11n,82p,1530b,553s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/c
 mex10.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfo
 nts/cm/cmmi10.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/publ
@@ -669,25 +688,26 @@ nts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/User/AppData/Local/Programs/Mi
 KTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/User/AppData/Local/Prog
 rams/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi9.pfb><C:/Users/User/AppData/Loc
 al/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmib10.pfb><C:/Users/User/Ap
-pData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/
-User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/
-Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pf
-b><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/c
-mr8.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfont
-s/cm/cmr9.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/a
-msfonts/cm/cmsy10.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/
-public/amsfonts/cm/cmsy6.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts
-/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/User/AppData/Local/Programs/MiKTe
-X/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/User/AppData/Local/Program
-s/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy9.pfb><C:/Users/User/AppData/Local/
-Programs/MiKTeX/fonts/type1/urw/courier/ucrr8a.pfb><C:/Users/User/AppData/Local
-/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/User/AppData/Local/
-Programs/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/Users/User/AppData/Local/
-Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/User/AppData/Local/P
-rograms/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on main.pdf (11 pages, 4654811 bytes).
+pData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmmib8.pfb><C:/
+Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.p
+fb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
+cmr6.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfon
+ts/cm/cmr7.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/
+amsfonts/cm/cmr8.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/p
+ublic/amsfonts/cm/cmr9.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/t
+ype1/public/amsfonts/cm/cmsy10.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX
+/fonts/type1/public/amsfonts/cm/cmsy6.pfb><C:/Users/User/AppData/Local/Programs
+/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/User/AppData/Local/P
+rograms/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/User/AppData/
+Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy9.pfb><C:/Users/User/A
+ppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrr8a.pfb><C:/Users/User/
+AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/User/A
+ppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/Users/User/A
+ppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/User/Ap
+pData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
+Output written on main.pdf (12 pages, 5070726 bytes).
 PDF statistics:
- 347 PDF objects out of 1000 (max. 8388607)
- 69 named destinations out of 1000 (max. 500000)
- 177 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 374 PDF objects out of 1000 (max. 8388607)
+ 74 named destinations out of 1000 (max. 500000)
+ 195 words of extra memory for PDF output out of 10000 (max. 10000000)
 

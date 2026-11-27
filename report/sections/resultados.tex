@@ -35,6 +35,41 @@ $k_m$ (firmware) & $5.088\times10^{-8}$ & N\,m/(rad/s)$^2$ \\
 
 El coeficiente $K_f$ depende del rango de ajuste: la hoja da $3.908\times10^{-6}$, el valor adoptado, usando los puntos de 1000 a 1500\,\textmu{}s y el ajuste cuadrático de los 13 puntos filtrados da $3.42\times10^{-6}$, un $12.5$\,\% menos ($R^2=0.987$ y $0.992$). La diferencia crece al extrapolar: a 2000\,\textmu{}s predicen $13.8$ y $12.2$\,N en total. Más importante, la curva de banco no es transferible al vuelo. En el vuelo B los cuatro motores trabajaron en promedio al $87$\,\% del recorrido, unos $1700$\,\textmu{}s, donde la curva de banco da $5.7$--$6.4$\,N en total, menos que el peso ($9.83$\,N), y sin embargo el dron voló. Las causas posibles son la recalibración de los ESC a 1040--1800\,\textmu{}s, la tensión de batería durante el ensayo y la medición con balanza; los datos no permiten separarlas. El firmware evita el problema suponiendo $\omega$ lineal en el recorrido calibrado y tratando $\omega_{\max}$ como parámetro de ajuste.
 
+\subsection{Actitud y altura entre versiones}
+La Fig.~\ref{fig:actitud} muestra roll, pitch y yaw en el tramo continuo más largo de dos vuelos previos a V\_11; la referencia es $0^\circ$ (dron nivelado y, en yaw, el rumbo inicial). En el vuelo de las 18:32 (V\_10b, 26.9\,s) el RMS respecto de $0^\circ$ es de $3.9^\circ$ en roll y $5.5^\circ$ en pitch; el pitch arranca cerca de $-12^\circ$ y se centra hacia los 8\,s. En el de las 17:45 (V\_10, 92\,s) es de $9.4^\circ$ y $3.7^\circ$, y el roll se mantiene entre $+5$ y $+20^\circ$ en la segunda mitad. Esa inclinación sostenida es compatible con el desbalance de mando entre motores (Sección~\ref{sec:disc}) y con la tensión de la cuerda, y no se puede separar de ella con los datos registrados. El yaw es el eje peor sostenido ($18.7^\circ$ y $12.5^\circ$ RMS): en el vuelo de las 18:32 deriva de $5^\circ$ a casi $30^\circ$, lo esperable sin magnetómetro y con la autoridad de yaw limitada al 30\,\% del recorrido.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.93\textwidth]{f_actitud.png}
+\caption{Actitud medida (IMU y filtro de Mahony) en el tramo continuo más largo de dos vuelos, con la referencia $0^\circ$ en línea discontinua y el RMS respecto de ella en cada panel.}
+\label{fig:actitud}
+\end{figure*}
+
+La Fig.~\ref{fig:holdver} compara la altura medida por el ultrasonido con la referencia mientras el modo MANTENER ALTURA estuvo activo, en cuatro vuelos de V\_10 a V\_11, y la Tabla~\ref{tab:holdver} resume el error. En los cuatro casos la altura medida queda por encima de la referencia. El peor es V\_10b (18:36): la referencia baja de 0.59 a 0.35\,m mientras el dron se queda cerca de 0.9\,m, con un error medio de $+0.40$\,m; es el mismo vuelo en el que el estimador se apartaba $0.58$\,m del ultrasonido (Tabla~\ref{tab:est}), de modo que el lazo regulaba una altura estimada que no era la real. Con V\_11 (19:09) el error medio baja a $+0.04$\,m y el RMS a $0.23$\,m. Los tramos duran entre 0.8 y 5.2\,s, así que la comparación indica la tendencia pero no caracteriza el lazo en régimen.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.93\textwidth]{f_hold_versiones.png}
+\caption{Altura medida (ultrasonido) y referencia con MANTENER ALTURA activo (zona sombreada) en cuatro vuelos: (a) y (b) V\_10, (c) V\_10b y (d) V\_11.}
+\label{fig:holdver}
+\end{figure*}
+
+\begin{table}[t]
+\caption{Error de altura (ultrasonido $-$ referencia) con MANTENER ALTURA activo.}
+\label{tab:holdver}
+\centering\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Vuelo & Duración [s] & Media [m] & RMS [m] & Máx. [m] \\
+\midrule
+V\_10, 17:42 & 2.0 & $+0.15$ & 0.18 & 0.38 \\
+V\_10, 17:45 & 0.8 & $+0.27$ & 0.34 & 0.46 \\
+V\_10b, 18:36 & 5.2 & $+0.40$ & 0.43 & 0.91 \\
+V\_11, 19:09 & 2.4 & $+0.04$ & 0.23 & 0.58 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Vuelos con V\_11: actitud}
 La Fig.~\ref{fig:vueloB} muestra el vuelo B y la Tabla~\ref{tab:vuelos} resume los dos vuelos. En B el empuje se aplicó en $t=0.9$\,s, el dron superó 0.3\,m en $3.3$\,s y alcanzó $1.48$\,m en $5.6$\,s. Después descendió lentamente desde $\approx0.6$\,m ($t\approx8$\,s) hasta tocar el suelo en $t\approx19.4$\,s.
 

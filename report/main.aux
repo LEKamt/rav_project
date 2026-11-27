@@ -36,61 +36,68 @@
 \citation{notas2}
 \citation{mahony}
 \citation{kalman}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Arquitectura de control del firmware V\_11. En verde, el lazo de altura y su estimador; en azul, la cascada de actitud; en naranja, las extensiones robusta y adaptativa; en gris, sensores y actuadores.}}{3}{figure.1}\protected@file@percent }
-\newlabel{fig:arq}{{1}{3}{Arquitectura de control del firmware V\_11. En verde, el lazo de altura y su estimador; en azul, la cascada de actitud; en naranja, las extensiones robusta y adaptativa; en gris, sensores y actuadores}{figure.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Esquema de control del firmware. Control de actitud en cascada: lazo externo P de ángulo, inversión de la ec. (26), lazo interno P de velocidad angular y linealización por realimentación $\bm  {u}=I\bm  {v}_\omega +\bm  {\omega }\times I\bm  {\omega }$ (ec. 41). El control lateral del esquema del curso no se implementa: sin sensor de $x$, $y$, las referencias $\phi _d$, $\theta _d$ se fijan desde la página web.}}{3}{figure.1}\protected@file@percent }
+\newlabel{fig:arq}{{1}{3}{Esquema de control del firmware. Control de actitud en cascada: lazo externo P de ángulo, inversión de la ec. (26), lazo interno P de velocidad angular y linealización por realimentación $\bm u=I\bm v_\omega +\bm \omega \times I\bm \omega $ (ec. 41). El control lateral del esquema del curso no se implementa: sin sensor de $x$, $y$, las referencias $\phi _d$, $\theta _d$ se fijan desde la página web}{figure.1}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Ganancias y límites por defecto (\texttt  {config.h}).}}{3}{table.2}\protected@file@percent }
 \newlabel{tab:gan}{{II}{3}{Ganancias y límites por defecto (\texttt {config.h})}{table.2}{}}
 \newlabel{eq:st}{{7}{3}{Arquitectura de control}{equation.7}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-E}}Estimación de estado}{3}{subsection.2.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-F}}Implementación, seguridad y desarrollo iterativo}{3}{subsection.2.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-G}}Protocolo experimental y procesamiento}{3}{subsection.2.7}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Evolución del firmware y su motivo.}}{4}{table.3}\protected@file@percent }
 \newlabel{tab:vers}{{III}{4}{Evolución del firmware y su motivo}{table.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-G}}Protocolo experimental y procesamiento}{4}{subsection.2.7}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {III}Resultados}{4}{section.3}\protected@file@percent }
 \newlabel{sec:res}{{III}{4}{Resultados}{section.3}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}Parámetros identificados}{4}{subsection.3.1}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Parámetros del dron. Incertidumbre estándar combinada (Anexo~A).}}{4}{table.4}\protected@file@percent }
 \newlabel{tab:par}{{IV}{4}{Parámetros del dron. Incertidumbre estándar combinada (Anexo~A)}{table.4}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Métricas de los vuelos V\_11 (muestras con altura $>0.15$\,m).}}{4}{table.5}\protected@file@percent }
-\newlabel{tab:vuelos}{{V}{4}{Métricas de los vuelos V\_11 (muestras con altura $>0.15$\,m)}{table.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Vuelos con V\_11: actitud}{4}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Actitud y altura entre versiones}{4}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Vuelos con V\_11: actitud}{4}{subsection.3.3}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Ensayos de identificación. (a) Empuje total (cuatro motores) frente al pulso PWM, con el ajuste cuadrático y la curva de la hoja. (b) Períodos medidos en el péndulo bifilar.}}{5}{figure.2}\protected@file@percent }
 \newlabel{fig:ident}{{2}{5}{Ensayos de identificación. (a) Empuje total (cuatro motores) frente al pulso PWM, con el ajuste cuadrático y la curva de la hoja. (b) Períodos medidos en el péndulo bifilar}{figure.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Actuación y saturación}{5}{subsection.3.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Altura: lazo cerrado y estimador}{5}{subsection.3.4}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces Estimador de altura frente a la lectura del ultrasonido.}}{5}{table.6}\protected@file@percent }
-\newlabel{tab:est}{{VI}{5}{Estimador de altura frente a la lectura del ultrasonido}{table.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}Discusión y limitaciones}{5}{subsection.3.5}\protected@file@percent }
-\newlabel{sec:disc}{{\mbox  {III-E}}{5}{Discusión y limitaciones}{subsection.3.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Vuelo B (V\_11): (a) altura estimada y sensores; (b) ángulos de Euler; (c) velocidades angulares $p$ y $q$; (d) mando de cada motor. La banda roja marca el tramo sin medida válida tras la toma de contacto.}}{6}{figure.3}\protected@file@percent }
-\newlabel{fig:vueloB}{{3}{6}{Vuelo B (V\_11): (a) altura estimada y sensores; (b) ángulos de Euler; (c) velocidades angulares $p$ y $q$; (d) mando de cada motor. La banda roja marca el tramo sin medida válida tras la toma de contacto}{figure.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Vuelo A (V\_11), modo MANTENER ALTURA (banda verde): (a) altura, (b) velocidad vertical estimada, (c) empuje pedido.}}{6}{figure.4}\protected@file@percent }
-\newlabel{fig:holdA}{{4}{6}{Vuelo A (V\_11), modo MANTENER ALTURA (banda verde): (a) altura, (b) velocidad vertical estimada, (c) empuje pedido}{figure.4}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {IV}Conclusiones}{6}{section.4}\protected@file@percent }
-\newlabel{sec:conc}{{IV}{6}{Conclusiones}{section.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Actitud medida (IMU y filtro de Mahony) en el tramo continuo más largo de dos vuelos, con la referencia $0^\circ $ en línea discontinua y el RMS respecto de ella en cada panel.}}{5}{figure.3}\protected@file@percent }
+\newlabel{fig:actitud}{{3}{5}{Actitud medida (IMU y filtro de Mahony) en el tramo continuo más largo de dos vuelos, con la referencia $0^\circ $ en línea discontinua y el RMS respecto de ella en cada panel}{figure.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Error de altura (ultrasonido $-$ referencia) con MANTENER ALTURA activo.}}{5}{table.5}\protected@file@percent }
+\newlabel{tab:holdver}{{V}{5}{Error de altura (ultrasonido $-$ referencia) con MANTENER ALTURA activo}{table.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Altura medida (ultrasonido) y referencia con MANTENER ALTURA activo (zona sombreada) en cuatro vuelos: (a) y (b) V\_10, (c) V\_10b y (d) V\_11.}}{6}{figure.4}\protected@file@percent }
+\newlabel{fig:holdver}{{4}{6}{Altura medida (ultrasonido) y referencia con MANTENER ALTURA activo (zona sombreada) en cuatro vuelos: (a) y (b) V\_10, (c) V\_10b y (d) V\_11}{figure.4}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces Métricas de los vuelos V\_11 (muestras con altura $>0.15$\,m).}}{6}{table.6}\protected@file@percent }
+\newlabel{tab:vuelos}{{VI}{6}{Métricas de los vuelos V\_11 (muestras con altura $>0.15$\,m)}{table.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Actuación y saturación}{6}{subsection.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}Altura: lazo cerrado y estimador}{6}{subsection.3.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Vuelo B (V\_11): (a) altura estimada y sensores; (b) ángulos de Euler; (c) velocidades angulares $p$ y $q$; (d) mando de cada motor. La banda roja marca el tramo sin medida válida tras la toma de contacto.}}{7}{figure.5}\protected@file@percent }
+\newlabel{fig:vueloB}{{5}{7}{Vuelo B (V\_11): (a) altura estimada y sensores; (b) ángulos de Euler; (c) velocidades angulares $p$ y $q$; (d) mando de cada motor. La banda roja marca el tramo sin medida válida tras la toma de contacto}{figure.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Estimador de altura frente a la lectura del ultrasonido.}}{7}{table.7}\protected@file@percent }
+\newlabel{tab:est}{{VII}{7}{Estimador de altura frente a la lectura del ultrasonido}{table.7}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Vuelo A (V\_11), modo MANTENER ALTURA (banda verde): (a) altura, (b) velocidad vertical estimada, (c) empuje pedido.}}{7}{figure.6}\protected@file@percent }
+\newlabel{fig:holdA}{{6}{7}{Vuelo A (V\_11), modo MANTENER ALTURA (banda verde): (a) altura, (b) velocidad vertical estimada, (c) empuje pedido}{figure.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-F}}Discusión y limitaciones}{7}{subsection.3.6}\protected@file@percent }
+\newlabel{sec:disc}{{\mbox  {III-F}}{7}{Discusión y limitaciones}{subsection.3.6}{}}
 \bibcite{notas1}{1}
 \bibcite{notas2}{2}
 \bibcite{mahony}{3}
 \bibcite{kalman}{4}
 \bibcite{levant}{5}
 \bibcite{jardin}{6}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Altura estimada y lectura del ultrasonido: (a) V\_10, con oscilaciones del estimador por debajo del suelo; (b) V\_11 (vuelo B).}}{7}{figure.5}\protected@file@percent }
-\newlabel{fig:estimador}{{5}{7}{Altura estimada y lectura del ultrasonido: (a) V\_10, con oscilaciones del estimador por debajo del suelo; (b) V\_11 (vuelo B)}{figure.5}{}}
-\@writefile{toc}{\contentsline {section}{Referencias}{7}{section*.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Montaje para $I_z$.}}{8}{figure.6}\protected@file@percent }
-\newlabel{fig:iz}{{6}{8}{Montaje para $I_z$}{figure.6}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Montaje para $I_x$ (colgado de una varilla).}}{8}{figure.7}\protected@file@percent }
-\newlabel{fig:ix}{{7}{8}{Montaje para $I_x$ (colgado de una varilla)}{figure.7}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Geometría del montaje para cada eje.}}{8}{table.7}\protected@file@percent }
-\newlabel{tab:geom}{{VII}{8}{Geometría del montaje para cada eje}{table.7}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces Tiempos de $N=5$ oscilaciones ($t_5$) y periodo $T_i=t_5/5$, con estadística por eje.}}{9}{table.8}\protected@file@percent }
-\newlabel{tab:tiempos}{{VIII}{9}{Tiempos de $N=5$ oscilaciones ($t_5$) y periodo $T_i=t_5/5$, con estadística por eje}{table.8}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {IX}{\ignorespaces Incertidumbre de $I$ por eje.}}{9}{table.9}\protected@file@percent }
-\newlabel{tab:bud}{{IX}{9}{Incertidumbre de $I$ por eje}{table.9}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {X}{\ignorespaces Momentos de inercia del dron. Valores en $10^{-3}$~kg\,m$^2$.}}{10}{table.10}\protected@file@percent }
-\newlabel{tab:res}{{X}{10}{Momentos de inercia del dron. Valores en $10^{-3}$~kg\,m$^2$}{table.10}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {XI}{\ignorespaces Empuje estático de un motor frente a PWM.}}{10}{table.11}\protected@file@percent }
-\newlabel{tab:kf}{{XI}{10}{Empuje estático de un motor frente a PWM}{table.11}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Empuje por motor frente a PWM y ajuste cuadrático.}}{11}{figure.8}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {XII}{\ignorespaces Parámetros identificados (incertidumbre estándar combinada).}}{11}{table.12}\protected@file@percent }
-\gdef \@abspage@last{11}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Altura estimada y lectura del ultrasonido: (a) V\_10, con oscilaciones del estimador por debajo del suelo; (b) V\_11 (vuelo B).}}{8}{figure.7}\protected@file@percent }
+\newlabel{fig:estimador}{{7}{8}{Altura estimada y lectura del ultrasonido: (a) V\_10, con oscilaciones del estimador por debajo del suelo; (b) V\_11 (vuelo B)}{figure.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Conclusiones}{8}{section.4}\protected@file@percent }
+\newlabel{sec:conc}{{IV}{8}{Conclusiones}{section.4}{}}
+\@writefile{toc}{\contentsline {section}{Referencias}{8}{section*.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Montaje para $I_z$.}}{9}{figure.8}\protected@file@percent }
+\newlabel{fig:iz}{{8}{9}{Montaje para $I_z$}{figure.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Montaje para $I_x$ (colgado de una varilla).}}{9}{figure.9}\protected@file@percent }
+\newlabel{fig:ix}{{9}{9}{Montaje para $I_x$ (colgado de una varilla)}{figure.9}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces Geometría del montaje para cada eje.}}{9}{table.8}\protected@file@percent }
+\newlabel{tab:geom}{{VIII}{9}{Geometría del montaje para cada eje}{table.8}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {IX}{\ignorespaces Tiempos de $N=5$ oscilaciones ($t_5$) y periodo $T_i=t_5/5$, con estadística por eje.}}{10}{table.9}\protected@file@percent }
+\newlabel{tab:tiempos}{{IX}{10}{Tiempos de $N=5$ oscilaciones ($t_5$) y periodo $T_i=t_5/5$, con estadística por eje}{table.9}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {X}{\ignorespaces Incertidumbre de $I$ por eje.}}{10}{table.10}\protected@file@percent }
+\newlabel{tab:bud}{{X}{10}{Incertidumbre de $I$ por eje}{table.10}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {XI}{\ignorespaces Momentos de inercia del dron. Valores en $10^{-3}$~kg\,m$^2$.}}{11}{table.11}\protected@file@percent }
+\newlabel{tab:res}{{XI}{11}{Momentos de inercia del dron. Valores en $10^{-3}$~kg\,m$^2$}{table.11}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {XII}{\ignorespaces Empuje estático de un motor frente a PWM.}}{11}{table.12}\protected@file@percent }
+\newlabel{tab:kf}{{XII}{11}{Empuje estático de un motor frente a PWM}{table.12}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Empuje por motor frente a PWM y ajuste cuadrático.}}{12}{figure.10}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {XIII}{\ignorespaces Parámetros identificados (incertidumbre estándar combinada).}}{12}{table.13}\protected@file@percent }
+\gdef \@abspage@last{12}
