@@ -1,0 +1,12 @@
+\section{Conclusiones}
+\label{sec:conc}
+
+\begin{itemize}
+\item Se implementó en un ESP32-S3 a 250\,Hz la cascada de control del curso (ángulo $\to$ velocidad angular $\to$ torque, altura con cancelación de gravedad y mezclador por inversión) con parámetros identificados: $I_x=9.71$, $I_y=10.56$, $I_z=20.08\times10^{-3}$\,kg\,m$^2$ con incertidumbres de $0.6$--$2.0\,\%$, el coeficiente de empuje de banco y el de par a partir de la relación empuje/par de la hélice.
+\item En dos vuelos V\_11 no hubo desarme por inclinación; en B el dron despegó, llegó a 1.5\,m y volvió al suelo, con $|\phi|<10^\circ$ el $78\,\%$ del tiempo y un pico de $57^\circ$ recuperado en menos de un segundo. La actitud queda acotada pero ruidosa: el $82\,\%$ de la varianza de $q$ está entre 8 y 25\,Hz.
+\item El Kalman de altura con el ruido medido del ultrasonido redujo la desviación frente al sensor de $0.26$--$1.39$\,m (V\_10) a $0.12$\,m (V\_11-B), pero diverge junto al suelo cuando el log marca \texttt{alt\_ok}=0 (B: de $0.06$ a $1.34$\,m; A: hasta $-1.0$\,m); falta una política explícita para ese caso.
+\item La brecha entre modelo y vuelo es el principal límite: la curva de empuje de banco no explica el vuelo, el empuje de hover pedido varió un $46\,\%$ entre vuelos, y la relación empuje/peso de $1.43$ deja el motor 2 al $\ge99\,\%$ del recorrido entre el 37 y el 43\,\% del tiempo.
+\item El lazo de altura cerrado solo se observó 2.6\,s (error rms $0.24$\,m) y las extensiones robusta y adaptativa no se registraron en vuelo, por lo que no hay evidencia de su efecto.
+\end{itemize}
+
+\textbf{Trabajo futuro.} Registrar en el CSV la referencia de actitud, el estado del super-twisting y de la adaptación ($w$, $\hat g$) y la tensión de batería; repetir el ensayo de empuje con los ESC en su calibración final; añadir derivada o un filtro en el lazo de velocidad angular; activar MANTENER ALTURA solo cerca del hover y suspender el estimador si no hay medida válida bajo 8\,cm; y añadir un sensor de posición lateral.
