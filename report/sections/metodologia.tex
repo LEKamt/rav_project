@@ -54,7 +54,7 @@ Los parámetros se obtuvieron con tres ensayos (hoja de cálculo del proyecto).
 I=\frac{m\,g\,R^2\,T^2}{4\pi^2 L_h}.
 \label{eq:bifilar}
 \end{equation}
-Los pares $(R,L_h)$ son $(0.047,0.53)$, $(0.0525,0.34)$ y $(0.06,0.88)$\,m para los ejes $x$, $y$ y $z$. La incertidumbre estadística se propaga como $\delta I/I=2\,\delta T/T$, con $\delta T$ el error estándar de la media de los cinco períodos; no incluye errores de medición de $R$ y $L_h$.
+Los pares $(R,L_h)$ son $(0.047,0.53)$, $(0.0525,0.34)$ y $(0.06,0.88)$\,m para los ejes $x$, $y$ y $z$. La incertidumbre combina la dispersión de los periodos, la resolución del cronómetro y las de la balanza y la cinta métrica; el montaje, las mediciones y la propagación completa están en el Anexo~A.
 
 \textbf{Empuje y par.} Se midió el empuje de un motor con hélice para pulsos de 1000 a 1750\,\textmu{}s (16 puntos, en gramos-fuerza). El empuje sigue $F=K_f(\mathrm{PWM}-\mathrm{PWM}_0)^2+c'$, con $\mathrm{PWM}_0=-b/2a$ y $c'=c-b^2/4a$ obtenidos de un ajuste cuadrático $F=a\,\mathrm{PWM}^2+b\,\mathrm{PWM}+c$ sobre los puntos no atípicos (se descartan 1450, 1500 y 1550\,\textmu{}s); luego $K_f$ sale de una regresión lineal de $F-c'$ contra $(\mathrm{PWM}-\mathrm{PWM}_0)^2$ (la hoja usa en esta regresión los puntos de 1000 a 1500\,\textmu{}s). El coeficiente de par se obtiene sin medir torque, con la relación entre empuje y par de la hélice, $k_m=\alpha^2k_f$, $\alpha^2=C_P D/(2\pi C_T)$, con $C_T=0.1125$, $C_P=0.0441$ y $D=0.254$\,m de la hélice APC 10$\times$4.5\,MR.
 

@@ -2,10 +2,10 @@
 \label{sec:res}
 
 \subsection{Parámetros identificados}
-La Tabla~\ref{tab:par} reúne los parámetros y la Fig.~\ref{fig:ident} los datos de los ensayos. Las inercias cumplen $I_x<I_y<I_z$ con incertidumbres estadísticas de $0.6$, $1.1$ y $2.0$\,\% ($I_z$ es la más dispersa: sus cinco períodos van de 4.28 a 4.54\,s). Con ellas, la autoridad de roll en hover es de $0.34$\,N\,m, equivalente a unos $35$\,rad/s$^2$ ($\approx2000^\circ$/s$^2$), calculada con los parámetros del firmware. Con $\omega_{\max}=1046$\,rad/s el empuje máximo es $14.05$\,N (relación empuje/peso $1.43$) y el hover cae en el $70$\,\% del acelerador. Con $k_fl/k_m=10.2$, el yaw es diez veces más caro que el roll en rango de motor.
+La Tabla~\ref{tab:par} reúne los parámetros y la Fig.~\ref{fig:ident} los datos de los ensayos. Las inercias cumplen $I_x<I_y<I_z$ con incertidumbres estándar combinadas de $1.4$, $1.6$ y $2.2$\,\% (Anexo~A); $I_z$ es la más dispersa porque sus cinco períodos van de 4.28 a 4.54\,s. Además $I_x+I_y$ difiere de $I_z$ en un $0.9$\,\%, compatible con cero, como se espera de un cuerpo casi plano. Con ellas, la autoridad de roll en hover es de $0.34$\,N\,m, equivalente a unos $35$\,rad/s$^2$ ($\approx2000^\circ$/s$^2$), calculada con los parámetros del firmware. Con $\omega_{\max}=1046$\,rad/s el empuje máximo es $14.05$\,N (relación empuje/peso $1.43$) y el hover cae en el $70$\,\% del acelerador. Con $k_fl/k_m=10.2$, el yaw es diez veces más caro que el roll en rango de motor.
 
 \begin{table}[t]
-\caption{Parámetros del dron. Incertidumbre: error estándar de 5 ensayos.}
+\caption{Parámetros del dron. Incertidumbre estándar combinada (Anexo~A).}
 \label{tab:par}
 \centering\footnotesize\setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}lll@{}}
@@ -14,12 +14,13 @@ Parámetro & Valor & Unidad \\
 \midrule
 Masa $m$ & 1.0022 & kg \\
 Brazo efectivo $l$ & 0.1616 & m \\
-$I_x$ & $(9.71\pm0.06)\times10^{-3}$ & kg\,m$^2$ \\
-$I_y$ & $(10.56\pm0.12)\times10^{-3}$ & kg\,m$^2$ \\
-$I_z$ & $(20.08\pm0.40)\times10^{-3}$ & kg\,m$^2$ \\
+$I_x$ & $(9.71\pm0.13)\times10^{-3}$ & kg\,m$^2$ \\
+$I_y$ & $(10.56\pm0.17)\times10^{-3}$ & kg\,m$^2$ \\
+$I_z$ & $(20.08\pm0.45)\times10^{-3}$ & kg\,m$^2$ \\
 $K_f$ (hoja, 1000--1500\,\textmu{}s) & $3.91\times10^{-6}$ & N/\textmu{}s$^2$ \\
-$a$ (ajuste cuadrático, 13 pts) & $3.42\times10^{-6}$ & N/\textmu{}s$^2$ \\
-$K_m=\alpha^2K_f$ ($\alpha^2=0.0158$\,m) & $6.19\times10^{-8}$ & N\,m/\textmu{}s$^2$ \\
+$a$ (ajuste cuadrático, 13 pts) & $(3.42\pm0.34)\times10^{-6}$ & N/\textmu{}s$^2$ \\
+$K_m=\alpha^2K_f$ (hoja) & $6.19\times10^{-8}$ & N\,m/\textmu{}s$^2$ \\
+$K_m=\alpha^2a$ (ajuste, Anexo~A) & $(5.42\pm0.53)\times10^{-8}$ & N\,m/\textmu{}s$^2$ \\
 $k_f$ (firmware) & $3.2107\times10^{-6}$ & N/(rad/s)$^2$ \\
 $k_m$ (firmware) & $5.088\times10^{-8}$ & N\,m/(rad/s)$^2$ \\
 \bottomrule

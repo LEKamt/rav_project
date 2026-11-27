@@ -1,0 +1,203 @@
+\section*{Anexo A. Identificación de parámetros del dron}
+
+Se identificaron los parámetros físicos de la planta del dron usados en el modelo y el controlador: los momentos de inercia $I_x$, $I_y$, $I_z$ (péndulo bifilar), y las constantes $K_f$ y $K_m$ (ensayo de empuje estático).
+
+\subsection*{Método del péndulo bifilar}
+El dron se cuelga de dos hilos paralelos de longitud $L$, separados una distancia $d=2a$, de modo que el eje cuyo momento de inercia se desea medir coincide con la vertical que pasa por el centro de masa. Al girar el cuerpo un ángulo pequeño $\theta$ (5--10$^\circ$) alrededor de ese eje, cada hilo se inclina un ángulo $\phi\approx a\theta/L$. Con tensión $T_w\approx mg/2$ por hilo, el par recuperador de la posición inicial es
+\begin{equation*}
+\tau=-2\,(T_w\sin\phi)\,a\approx-\frac{m g a^{2}}{L}\,\theta ,
+\end{equation*}
+
+y la ecuación de movimiento $I\ddot\theta+\dfrac{m g a^2}{L}\theta=0$ da $\omega_0^2=\dfrac{m g a^2}{I L}$. Con $T=2\pi/\omega_0$, y con $T=t_N/N$ para $N$ oscilaciones completas:
+\begin{equation*}
+I=\frac{m\,g\,a^{2}\,T^{2}}{4\pi^{2}L}=\frac{m\,g\,d^{2}\,T^{2}}{16\pi^{2}L}.
+\end{equation*}
+El bifilar solo mide el momento respecto del eje vertical, por lo que se reorienta el dron 90$^\circ$ entre mediciones para obtener la inercia en cada eje. Si se usara una plataforma de soporte, se restaría su inercia: $I_{dron}=I_{total}-I_{plataforma}$. En este ensayo el dron se suspendió directamente de los hilos amarrados a su estructura (Figs.~\ref{fig:iz} y \ref{fig:ix}), por lo que se toma $I_{plataforma}\approx0$.
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.42\textwidth}\centering
+\includegraphics[height=7.2cm]{Iz.jpg}
+\caption{Montaje para $I_z$.}\label{fig:iz}
+\end{minipage}\hfill
+\begin{minipage}{0.42\textwidth}\centering
+\includegraphics[height=7.2cm]{Ix.jpg}
+\caption{Montaje para $I_x$ (colgado de una varilla).}\label{fig:ix}
+\end{minipage}
+\end{figure}
+
+\subsection*{Mediciones}
+La masa total se midió con balanza de resolución 0.01~g: $m=1002.20$~[g] $=1.00220$~[kg]. Las longitudes $d$ y $L$ se midieron con cinta métrica (precisión $\pm1$~mm). El tiempo de $N=5$ oscilaciones completas se midió con cronómetro de resolución 0.01~s, repitiendo cinco veces por eje. La Tabla~\ref{tab:geom} resume la geometría y la Tabla~\ref{tab:tiempos} los tiempos.
+
+\begin{table}[H]
+\centering
+\caption{Geometría del montaje para cada eje.}\label{tab:geom}
+\begin{tabular}{ccccc}
+\toprule
+Eje & $d=2a$ [mm] & $a$ [mm] & $L$ [mm] & $L/a$ \\
+\midrule
+$z$ & $120$ & $60.0$ & $880$ & $14.7$ \\
+$x$ & $94$ & $47.0$ & $530$ & $11.3$ \\
+$y$ & $105$ & $52.5$ & $340$ & $6.5$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Tiempos de $N=5$ oscilaciones ($t_5$) y periodo $T_i=t_5/5$, con estadística por eje.}\label{tab:tiempos}
+\small
+\begin{tabular}{c cc cc cc}
+\toprule
+ & \multicolumn{2}{c}{Eje $z$} & \multicolumn{2}{c}{Eje $x$} & \multicolumn{2}{c}{Eje $y$} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+Medición & $t_5$ [s] & $T_i$ [s] & $t_5$ [s] & $T_i$ [s] & $t_5$ [s] & $T_i$ [s] \\
+\midrule
+1 & 21.38 & 4.276 & 15.40 & 3.080 & 11.43 & 2.286 \\
+2 & 22.69 & 4.538 & 15.27 & 3.054 & 11.47 & 2.294 \\
+3 & 22.16 & 4.432 & 15.16 & 3.032 & 11.46 & 2.292 \\
+4 & 22.47 & 4.494 & 15.37 & 3.074 & 11.61 & 2.322 \\
+5 & 22.29 & 4.458 & 15.25 & 3.050 & 11.21 & 2.242 \\
+\midrule
+Media $\bar T$ [s] & \multicolumn{2}{c}{4.4396} & \multicolumn{2}{c}{3.0580} & \multicolumn{2}{c}{2.2872} \\
+Desv. est. $s$ [s] & \multicolumn{2}{c}{0.0998} & \multicolumn{2}{c}{0.0193} & \multicolumn{2}{c}{0.0288} \\
+$u_A=s/\sqrt{n}$ [s] & \multicolumn{2}{c}{0.0446} & \multicolumn{2}{c}{0.0086} & \multicolumn{2}{c}{0.0129} \\
+$u_B=u_{res}/N$ [s] & \multicolumn{2}{c}{0.0006} & \multicolumn{2}{c}{0.0006} & \multicolumn{2}{c}{0.0006} \\
+$u(\bar T)$ [s] & \multicolumn{2}{c}{0.0446} & \multicolumn{2}{c}{0.0087} & \multicolumn{2}{c}{0.0129} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{Propagación de incertidumbre}
+Se aplica la ley de propagación, $I=f(m,a,T,L)$, con $g=9.81$~m/s$^2$ y $N$ exactos y entradas independientes:
+\begin{equation*}
+u_c^2(I)=\sum_i\left(\frac{\partial I}{\partial x_i}\right)^{2}u^2(x_i),\qquad
+\frac{u_c(I)}{I}=\sqrt{\left(\frac{u_m}{m}\right)^{2}+\left(\frac{2u_a}{a}\right)^{2}+\left(\frac{2u_T}{T}\right)^{2}+\left(\frac{u_L}{L}\right)^{2}}.
+\end{equation*}
+Las incertidumbres estándar de entrada se evaluaron así:
+\begin{itemize}
+\item \textbf{Masa:} resolución de la balanza 0.01~g, distribución rectangular: $u_m=0.01~\text{g}/\sqrt{12}=2.89\times10^{-6}$~kg.
+\item \textbf{Longitudes:} tolerancia $\pm1$~mm, rectangular: $u_L=u_d=1~\text{mm}/\sqrt3=0.577$~mm. Como $a=d/2$, $u_a=u_d/2=0.289$~mm.
+\item \textbf{Periodo} $\bar T=\bar t_N/N$: componente tipo A, $u_A=s/\sqrt{n}$ con $n=5$ periodos; y componente tipo B por resolución del cronómetro, $u_B=\dfrac{0.01~\text{s}/\sqrt{12}}{N}=0.0006$~s y se toma como error común a las cinco lecturas. Se combinan en cuadratura: $u_T=\sqrt{u_A^2+u_B^2}$.
+\end{itemize}
+La Tabla~\ref{tab:bud} presenta la distribución de incertidumbre: $c_i=\frac{\partial I}{\partial x_i}$ es el coeficiente de sensibilidad y la última columna el porcentaje de la varianza total aportado por cada entrada.
+
+\begin{table}[H]
+\centering
+\caption{Incertidumbre de $I$ por eje.}\label{tab:bud}
+\small
+\begin{tabular}{clccccc}
+\toprule
+Eje & $x_i$ & Valor & $u(x_i)$ & $c_i$ & $|c_i|u_i$ & \% var. \\
+\midrule
+$z$ & $m$ & $1.00220$ & $2.89\times10^{-6}$ & $+20.04$ & $0.06$ & $0.0$ \\
+ & $a$ & $60.0$ & $0.289$ & $+669.34$ & $193.22$ & $18.6$ \\
+ & $\bar T$ & $4.4396$ & $0.0446$ & $+9.05$ & $403.59$ & $81.3$ \\
+ & $L$ & $880.0$ & $0.577$ & $-22.82$ & $13.17$ & $0.1$ \\
+\midrule
+$x$ & $m$ & $1.00220$ & $2.89\times10^{-6}$ & $+9.69$ & $0.03$ & $0.0$ \\
+ & $a$ & $47.0$ & $0.289$ & $+413.04$ & $119.23$ & $81.9$ \\
+ & $\bar T$ & $3.0580$ & $0.0087$ & $+6.35$ & $55.03$ & $17.4$ \\
+ & $L$ & $530.0$ & $0.577$ & $-18.31$ & $10.57$ & $0.6$ \\
+\midrule
+$y$ & $m$ & $1.00220$ & $2.89\times10^{-6}$ & $+10.54$ & $0.03$ & $0.0$ \\
+ & $a$ & $52.5$ & $0.289$ & $+402.33$ & $116.14$ & $48.1$ \\
+ & $\bar T$ & $2.2872$ & $0.0129$ & $+9.24$ & $119.19$ & $50.7$ \\
+ & $L$ & $340.0$ & $0.577$ & $-31.06$ & $17.93$ & $1.1$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Unidades de $x_i$ y $u(x_i)$: kg para $m$, mm para $a$ y $L$, s para $\bar T$. Las contribuciones $|c_i|u_i$ están en $10^{-6}$~kg\,m$^2$ y $c_i$ en $10^{-3}$~kg\,m$^2$ por unidad de $x_i$ (con $a$, $L$ en m).
+
+La fuente dominante depende del eje: en $z$ es el periodo ($\approx81$\,\% de la varianza, por la dispersión entre repeticiones asociada al instante de inicio y fin del cronometraje); en $x$ es el semiancho $a$ ($\approx82$\,\%, porque $a$ es pequeño y su error relativo se duplica); en $y$ se reparten entre $a$ ($\approx48$\,\%) y $T$ ($\approx51$\,\%). La masa y, en menor medida, $L$ son despreciables.
+
+\subsection*{Resultados de inercia}
+La Tabla~\ref{tab:res} da los momentos de inercia con incertidumbre combinada $u_c$ y expandida $U=2u_c$ (factor de cobertura $k=2$, aprox.\ 95\,\%). La última columna es la desviación estándar de una simulación de Monte Carlo ($4\times10^5$ muestras, entradas rectangulares/normal) como verificación de la linealización; coincide con $u_c$.
+
+\begin{table}[H]
+\centering
+\caption{Momentos de inercia del dron. Valores en $10^{-3}$~kg\,m$^2$.}\label{tab:res}
+\small
+\begin{tabular}{lcccccc}
+\toprule
+Eje & $I\pm u_c$ & $u_c$ & $U\ (k{=}2)$ & $u_c/I$ [\%] & $U/I$ [\%] & $u_{MC}$ \\
+\midrule
+$I_z$ & $20.08 \pm 0.45$ & $0.45$ & $0.90$ & $2.2$ & $4.5$ & $0.45$ \\
+$I_x$ & $9.71 \pm 0.13$ & $0.13$ & $0.26$ & $1.4$ & $2.7$ & $0.13$ \\
+$I_y$ & $10.56 \pm 0.17$ & $0.17$ & $0.33$ & $1.6$ & $3.2$ & $0.17$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Verificación de coherencia.} Para un cuerpo aproximadamente plano se espera $I_z\approx I_x+I_y$. Se obtiene $I_x+I_y=(20.27\pm0.21)\times10^{-3}$~kg\,m$^2$ frente a $I_z=(20.08\pm0.45)\times10^{-3}$~kg\,m$^2$; la diferencia es $(-0.19\pm0.50)\times10^{-3}$~kg\,m$^2$ ($0.9$\,\% de $I_z$), compatible con cero dentro de la incertidumbre combinada. Además $I_x<I_y<I_z$, como corresponde a un cuadricóptero con brazos en X.
+
+\subsection*{Constantes de empuje $K_f$ y de par $K_m$}
+Con el dron fijo a la balanza se aplicó una señal PWM creciente a un motor y se registró el empuje en gramos (resolución 0.01~g), convertido a fuerza con $F=g\cdot m_g/1000$. La resolución de la balanza equivale a $u_F=2.8\times10^{-5}$~N, despreciable frente a la dispersión del ajuste, por lo que la incertidumbre de $K_f$ proviene de la regresión.
+
+\begin{table}[H]
+\centering
+\caption{Empuje estático de un motor frente a PWM.}\label{tab:kf}
+\small
+\begin{tabular}{cccc}
+\toprule
+PWM [\us] & Masa [g] & $F$ [N] & Usado en el ajuste \\
+\midrule
+1000 & 0.0 & 0.0000 & Sí \\
+1050 & 2.5 & 0.0245 & Sí \\
+1100 & 3.6 & 0.0353 & Sí \\
+1150 & 8.0 & 0.0785 & Sí \\
+1200 & 11.6 & 0.1138 & Sí \\
+1250 & 20.0 & 0.1962 & Sí \\
+1300 & 25.0 & 0.2452 & Sí \\
+1350 & 33.6 & 0.3296 & Sí \\
+1400 & 45.7 & 0.4483 & Sí \\
+1450 & 70.0 & 0.6867 & No \\
+1500 & 77.9 & 0.7642 & No \\
+1550 & 81.0 & 0.7946 & No \\
+1600 & 91.0 & 0.8927 & Sí \\
+1650 & 120.0 & 1.1772 & Sí \\
+1700 & 150.0 & 1.4715 & Sí \\
+1750 & 178.0 & 1.7462 & Sí \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Se descartaron los puntos de 1450, 1500 y 1550~\us, que se apartan de la tendencia. Se ajustó $F=a\,\text{PWM}^2+b\,\text{PWM}+c$ por mínimos cuadrados con los 13 puntos restantes, que equivale a
+\begin{equation*}
+F=K_f\,(\text{PWM}-\text{PWM}_0)^2+c',\qquad K_f=a,\quad \text{PWM}_0=-\frac{b}{2a},\quad c'=c-\frac{b^2}{4a}.
+\end{equation*}
+Las incertidumbres se obtienen de la matriz de covarianza del ajuste (desviación residual $s_F=0.059$~N, $R^2=0.9920$) y se propagan a $\text{PWM}_0$ y $c'$ con sus gradientes. Resultados:
+\begin{align*}
+K_f &= (3.42 \pm 0.34)\times10^{-6}~\text{N/\us}^2 \quad (u/K_f=9.9\,\text{\%}),\\
+\text{PWM}_0 &= 1058 \pm 34~\text{\us}, \qquad c' = 0.030 \pm 0.029~\text{N}.
+\end{align*}
+La constante de par se obtiene de $K_m=\alpha^2K_f$, con $\alpha^2=\dfrac{C_p}{C_t}\dfrac{D}{2\pi}=0.01585$~m (hélice APC 10$\times$4.5 MR: $C_t=0.1125$, $C_p=0.0441$, $D=0.254$~m).
+\[
+K_m=(5.42 \pm 0.53)\times10^{-8}~\text{N\,m/\us}^2 .
+\]
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.62\textwidth]{kf_ajuste.png}
+\caption{Empuje por motor frente a PWM y ajuste cuadrático.}
+\end{figure}
+
+\subsection*{Resumen}
+\begin{table}[H]
+\centering
+\caption{Parámetros identificados (incertidumbre estándar combinada).}
+\begin{tabular}{lcc}
+\toprule
+Parámetro & Valor & Unidades \\
+\midrule
+Masa total $m$ & $1.00220$ ($u=3\times10^{-6}$) & kg \\
+Longitud de brazo $l$ & $0.1616$ & m \\
+Inercia $I_x$ & $(9.71 \pm 0.13)\times10^{-3}$ & kg\,m$^2$ \\
+Inercia $I_y$ & $(10.56 \pm 0.17)\times10^{-3}$ & kg\,m$^2$ \\
+Inercia $I_z$ & $(20.08 \pm 0.45)\times10^{-3}$ & kg\,m$^2$ \\
+Constante de fuerza $K_f$ & $(3.42 \pm 0.34)\times10^{-6}$ & N/\textmu s$^2$ \\
+Constante de par $K_m$ & $(5.42 \pm 0.53)\times10^{-8}$ & N\,m/\textmu s$^2$ \\
+\bottomrule
+\end{tabular}
+\end{table}
