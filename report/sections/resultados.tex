@@ -17,10 +17,9 @@ Brazo efectivo $l$ & 0.1616 & m \\
 $I_x$ & $(9.71\pm0.13)\times10^{-3}$ & kg\,m$^2$ \\
 $I_y$ & $(10.56\pm0.17)\times10^{-3}$ & kg\,m$^2$ \\
 $I_z$ & $(20.08\pm0.45)\times10^{-3}$ & kg\,m$^2$ \\
-$K_f$ (hoja, 1000--1500\,\textmu{}s) & $3.91\times10^{-6}$ & N/\textmu{}s$^2$ \\
+$K_f$ (hoja, 1000--1500\,\textmu{}s) & $(3.908\pm0.149)\times10^{-6}$ & N/\textmu{}s$^2$ \\
 $a$ (ajuste cuadrático, 13 pts) & $(3.42\pm0.34)\times10^{-6}$ & N/\textmu{}s$^2$ \\
-$K_m=\alpha^2K_f$ (hoja) & $6.19\times10^{-8}$ & N\,m/\textmu{}s$^2$ \\
-$K_m=\alpha^2a$ (ajuste, Anexo~A) & $(5.42\pm0.53)\times10^{-8}$ & N\,m/\textmu{}s$^2$ \\
+$K_m=\alpha^2K_f$ ($\alpha^2=0.0158$\,m) & $(6.19\pm0.24)\times10^{-8}$ & N\,m/\textmu{}s$^2$ \\
 $k_f$ (firmware) & $3.2107\times10^{-6}$ & N/(rad/s)$^2$ \\
 $k_m$ (firmware) & $5.088\times10^{-8}$ & N\,m/(rad/s)$^2$ \\
 \bottomrule
@@ -34,7 +33,7 @@ $k_m$ (firmware) & $5.088\times10^{-8}$ & N\,m/(rad/s)$^2$ \\
 \label{fig:ident}
 \end{figure*}
 
-El coeficiente $K_f$ depende del rango de ajuste: la hoja da $3.91\times10^{-6}$ usando los puntos de 1000 a 1500\,\textmu{}s y el ajuste cuadrático de los 13 puntos filtrados da $3.42\times10^{-6}$, un $12.5$\,\% menos ($R^2=0.987$ y $0.992$). La diferencia crece al extrapolar: a 2000\,\textmu{}s predicen $13.8$ y $12.2$\,N en total. Más importante, la curva de banco no es transferible al vuelo. En el vuelo B los cuatro motores trabajaron en promedio al $87$\,\% del recorrido, unos $1700$\,\textmu{}s, donde la curva de banco da $5.7$--$6.4$\,N en total, menos que el peso ($9.83$\,N), y sin embargo el dron voló. Las causas posibles son la recalibración de los ESC a 1040--1800\,\textmu{}s, la tensión de batería durante el ensayo y la medición con balanza; los datos no permiten separarlas. El firmware evita el problema suponiendo $\omega$ lineal en el recorrido calibrado y tratando $\omega_{\max}$ como parámetro de ajuste.
+El coeficiente $K_f$ depende del rango de ajuste: la hoja da $3.908\times10^{-6}$, el valor adoptado, usando los puntos de 1000 a 1500\,\textmu{}s y el ajuste cuadrático de los 13 puntos filtrados da $3.42\times10^{-6}$, un $12.5$\,\% menos ($R^2=0.987$ y $0.992$). La diferencia crece al extrapolar: a 2000\,\textmu{}s predicen $13.8$ y $12.2$\,N en total. Más importante, la curva de banco no es transferible al vuelo. En el vuelo B los cuatro motores trabajaron en promedio al $87$\,\% del recorrido, unos $1700$\,\textmu{}s, donde la curva de banco da $5.7$--$6.4$\,N en total, menos que el peso ($9.83$\,N), y sin embargo el dron voló. Las causas posibles son la recalibración de los ESC a 1040--1800\,\textmu{}s, la tensión de batería durante el ensayo y la medición con balanza; los datos no permiten separarlas. El firmware evita el problema suponiendo $\omega$ lineal en el recorrido calibrado y tratando $\omega_{\max}$ como parámetro de ajuste.
 
 \subsection{Vuelos con V\_11: actitud}
 La Fig.~\ref{fig:vueloB} muestra el vuelo B y la Tabla~\ref{tab:vuelos} resume los dos vuelos. En B el empuje se aplicó en $t=0.9$\,s, el dron superó 0.3\,m en $3.3$\,s y alcanzó $1.48$\,m en $5.6$\,s. Después descendió lentamente desde $\approx0.6$\,m ($t\approx8$\,s) hasta tocar el suelo en $t\approx19.4$\,s.

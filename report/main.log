@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.9.13)  27 NOV 2026 10:55
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.9.13)  27 NOV 2026 11:19
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -478,10 +478,10 @@ ex.def
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count322
 ) (main.aux
-LaTeX Info: Redefining \. on input line 13.
-LaTeX Info: Redefining \% on input line 13.
+LaTeX Info: Redefining \. on input line 14.
+LaTeX Info: Redefining \% on input line 14.
 Package babel Info: 'spanish' activates 'spanish' shorthands.
-(babel)             Reported on input line 13.
+(babel)             Reported on input line 14.
 )
 \openout1 = `main.aux'.
 
@@ -557,8 +557,10 @@ LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 1
 (C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 )
-[1{C:/Users/User/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Use
-r/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
+Underfull \vbox (badness 1769) has occurred while \output is active []
+
+ [1{C:/Users/User/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Us
+er/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
 
 
 ]
@@ -581,31 +583,28 @@ LaTeX Font Info:    Trying to load font information for T1+pcr on input line 96
 (C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 )
-[2] [3 <./figures/f_arquitectura.png>]) (sections/resultados.tex
-<figures/f_ident.png, id=147, 505.6491pt x 157.7895pt>
+[2]) (sections/resultados.tex [3 <./figures/f_arquitectura.png>]
+<figures/f_ident.png, id=148, 505.6491pt x 157.7895pt>
 File: figures/f_ident.png Graphic file (type png)
 <use figures/f_ident.png>
-Package pdftex.def Info: figures/f_ident.png  used on input line 32.
+Package pdftex.def Info: figures/f_ident.png  used on input line 31.
 (pdftex.def)             Requested size: 479.87622pt x 149.75229pt.
-<figures/f_vuelo_B.png, id=150, 236.082pt x 394.1124pt>
+<figures/f_vuelo_B.png, id=151, 236.082pt x 394.1124pt>
 File: figures/f_vuelo_B.png Graphic file (type png)
 <use figures/f_vuelo_B.png>
-Package pdftex.def Info: figures/f_vuelo_B.png  used on input line 44.
+Package pdftex.def Info: figures/f_vuelo_B.png  used on input line 43.
 (pdftex.def)             Requested size: 244.4403pt x 408.06912pt.
  [4]
 <figures/f_hold_A.png, id=167, 241.6227pt x 285.4665pt>
 File: figures/f_hold_A.png Graphic file (type png)
 <use figures/f_hold_A.png>
-Package pdftex.def Info: figures/f_hold_A.png  used on input line 83.
+Package pdftex.def Info: figures/f_hold_A.png  used on input line 82.
 (pdftex.def)             Requested size: 234.35815pt x 276.8978pt.
 <figures/f_estimador.png, id=170, 238.2501pt x 242.3454pt>
 File: figures/f_estimador.png Graphic file (type png)
 <use figures/f_estimador.png>
-Package pdftex.def Info: figures/f_estimador.png  used on input line 111.
+Package pdftex.def Info: figures/f_estimador.png  used on input line 110.
 (pdftex.def)             Requested size: 234.35815pt x 238.39915pt.
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
  [5 <./figures/f_ident.png>]) (sections/conclusiones.tex [6 <./figures/f_vuelo_
 B.png> <./figures/f_hold_A.png>]) [7
 
@@ -624,13 +623,13 @@ Package pdftex.def Info: figures/Ix.jpg  used on input line 24.
 [8
 
 
- <./figures/Iz.jpg (PNG copy)> <./figures/Ix.jpg (PNG copy)>] [9]
-<figures/kf_ajuste.png, id=218, 404.712pt x 260.172pt>
+ <./figures/Iz.jpg (PNG copy)> <./figures/Ix.jpg (PNG copy)>] [9] [10]
+<figures/kf_ajuste.png, id=226, 404.712pt x 260.172pt>
 File: figures/kf_ajuste.png Graphic file (type png)
 <use figures/kf_ajuste.png>
-Package pdftex.def Info: figures/kf_ajuste.png  used on input line 182.
+Package pdftex.def Info: figures/kf_ajuste.png  used on input line 188.
 (pdftex.def)             Requested size: 319.91748pt x 205.67255pt.
- [10])
+)
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -643,8 +642,8 @@ Before submitting the final camera ready copy, remember to:
  process uses the appropriate paper size.
 
 [11 <./figures/kf_ajuste.png>] (main.aux
-LaTeX Info: Redefining \. on input line 13.
-LaTeX Info: Redefining \% on input line 13.
+LaTeX Info: Redefining \. on input line 14.
+LaTeX Info: Redefining \% on input line 14.
 )
  ***********
 LaTeX2e <2025-11-01>
@@ -660,7 +659,7 @@ Here is how much of TeX's memory you used:
  41788 multiletter control sequences out of 15000+600000
  752421 words of font info for 188 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 80i,13n,82p,1530b,553s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 80i,11n,82p,1530b,555s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/c
 mex10.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfo
 nts/cm/cmmi10.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/publ
@@ -686,7 +685,7 @@ Programs/MiKTeX/fonts/type1/urw/courier/ucrr8a.pfb><C:/Users/User/AppData/Local
 Programs/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/Users/User/AppData/Local/
 Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/User/AppData/Local/P
 rograms/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on main.pdf (11 pages, 4654014 bytes).
+Output written on main.pdf (11 pages, 4654811 bytes).
 PDF statistics:
  347 PDF objects out of 1000 (max. 8388607)
  69 named destinations out of 1000 (max. 500000)

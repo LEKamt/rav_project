@@ -141,7 +141,7 @@ Con el dron fijo a la balanza se aplicó una señal PWM creciente a un motor y s
 \small
 \begin{tabular}{cccc}
 \toprule
-PWM [\us] & Masa [g] & $F$ [N] & Usado en el ajuste \\
+PWM [\us] & Masa [g] & $F$ [N] & En el ajuste cuadrático \\
 \midrule
 1000 & 0.0 & 0.0000 & Sí \\
 1050 & 2.5 & 0.0245 & Sí \\
@@ -165,16 +165,22 @@ PWM [\us] & Masa [g] & $F$ [N] & Usado en el ajuste \\
 
 Se descartaron los puntos de 1450, 1500 y 1550~\us, que se apartan de la tendencia. Se ajustó $F=a\,\text{PWM}^2+b\,\text{PWM}+c$ por mínimos cuadrados con los 13 puntos restantes, que equivale a
 \begin{equation*}
-F=K_f\,(\text{PWM}-\text{PWM}_0)^2+c',\qquad K_f=a,\quad \text{PWM}_0=-\frac{b}{2a},\quad c'=c-\frac{b^2}{4a}.
+F=a\,(\text{PWM}-\text{PWM}_0)^2+c',\qquad \text{PWM}_0=-\frac{b}{2a},\quad c'=c-\frac{b^2}{4a}.
 \end{equation*}
-Las incertidumbres se obtienen de la matriz de covarianza del ajuste (desviación residual $s_F=0.059$~N, $R^2=0.9920$) y se propagan a $\text{PWM}_0$ y $c'$ con sus gradientes. Resultados:
+Las incertidumbres de este ajuste se obtienen de su matriz de covarianza (desviación residual $s_F=0.059$~N, $R^2=0.9920$) y se propagan a $\text{PWM}_0$ y $c'$ con sus gradientes:
 \begin{align*}
-K_f &= (3.42 \pm 0.34)\times10^{-6}~\text{N/\us}^2 \quad (u/K_f=9.9\,\text{\%}),\\
+a &= (3.42 \pm 0.34)\times10^{-6}~\text{N/\us}^2,\\
 \text{PWM}_0 &= 1058 \pm 34~\text{\us}, \qquad c' = 0.030 \pm 0.029~\text{N}.
 \end{align*}
-La constante de par se obtiene de $K_m=\alpha^2K_f$, con $\alpha^2=\dfrac{C_p}{C_t}\dfrac{D}{2\pi}=0.01585$~m (hélice APC 10$\times$4.5 MR: $C_t=0.1125$, $C_p=0.0441$, $D=0.254$~m).
+Con $\text{PWM}_0$ y $c'$ fijados, la hoja de cálculo obtiene $K_f$ como la pendiente de una regresión lineal de $F-c'$ contra $(\text{PWM}-\text{PWM}_0)^2$ con los 11 puntos de 1000 a 1500~\us. Es el valor que se adopta en el modelo:
+\begin{equation*}
+K_f = (3.908 \pm 0.149)\times10^{-6}~\text{N/\us}^2 \quad (u/K_f=3.8\,\text{\%}),
+\end{equation*}
+con ordenada $-0.005$~N, desviación residual $0.032$~N y $R^2=0.9872$. Su incertidumbre es la de la pendiente y no incluye la de $\text{PWM}_0$, que se toma fijo. $K_f$ es un $14$\,\% mayor que $a$ porque la regresión de la hoja usa solo el tramo bajo de la curva, mientras que el ajuste cuadrático incluye los puntos de 1600 a 1750~\us.
+
+La constante de par se obtiene de $K_m=\alpha^2K_f$, con $\alpha^2=\dfrac{C_p}{C_t}\dfrac{D}{2\pi}=0.01585$~m (hélice APC 10$\times$4.5 MR: $C_t=0.1125$, $C_p=0.0441$, $D=0.254$~m):
 \[
-K_m=(5.42 \pm 0.53)\times10^{-8}~\text{N\,m/\us}^2 .
+K_m=(6.19 \pm 0.24)\times10^{-8}~\text{N\,m/\us}^2 .
 \]
 
 \begin{figure}[H]
@@ -196,8 +202,8 @@ Longitud de brazo $l$ & $0.1616$ & m \\
 Inercia $I_x$ & $(9.71 \pm 0.13)\times10^{-3}$ & kg\,m$^2$ \\
 Inercia $I_y$ & $(10.56 \pm 0.17)\times10^{-3}$ & kg\,m$^2$ \\
 Inercia $I_z$ & $(20.08 \pm 0.45)\times10^{-3}$ & kg\,m$^2$ \\
-Constante de fuerza $K_f$ & $(3.42 \pm 0.34)\times10^{-6}$ & N/\textmu s$^2$ \\
-Constante de par $K_m$ & $(5.42 \pm 0.53)\times10^{-8}$ & N\,m/\textmu s$^2$ \\
+Constante de fuerza $K_f$ & $(3.908 \pm 0.149)\times10^{-6}$ & N/\textmu s$^2$ \\
+Constante de par $K_m$ & $(6.19 \pm 0.24)\times10^{-8}$ & N\,m/\textmu s$^2$ \\
 \bottomrule
 \end{tabular}
 \end{table}
